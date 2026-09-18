@@ -1,6 +1,8 @@
 package testRunner;
 
 import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -63,9 +65,24 @@ public class MainRunner extends AbstractTestNGCucumberTests {
 
         ThreadContext.put("browser", "Chrome");
 
+        String reportBaseFolder =
+            System.getProperty("user.dir") + "/Reports/ExtentReports";
+
+        String timestamp =
+            new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+
+        /*
+         * Extent Spark Report configuration
+         */
+
         System.setProperty(
             "basefolder.name",
-            System.getProperty("user.dir") + "/Reports/ExtentReports"
+            reportBaseFolder
+        );
+
+        System.setProperty(
+            "extent.reporter.spark.start",
+            "true"
         );
 
         System.setProperty(
@@ -76,6 +93,21 @@ public class MainRunner extends AbstractTestNGCucumberTests {
         System.setProperty(
             "extent.reporter.spark.enableOfflineMode",
             "true"
+        );
+
+        System.setProperty(
+            "extent.reporter.spark.vieworder",
+            "dashboard,test,category,exception,author,device,log"
+        );
+
+        /*
+         * Keep timestamp information available
+         * for the execution folder.
+         */
+
+        System.setProperty(
+            "extent.execution.timestamp",
+            timestamp
         );
     }
 
@@ -101,12 +133,16 @@ public class MainRunner extends AbstractTestNGCucumberTests {
 
     static {
 
-        Logger.getLogger("org.openqa.selenium").setLevel(Level.OFF);
+        Logger.getLogger("org.openqa.selenium")
+              .setLevel(Level.OFF);
 
-        Logger.getLogger("org.openqa.selenium.remote").setLevel(Level.OFF);
+        Logger.getLogger("org.openqa.selenium.remote")
+              .setLevel(Level.OFF);
 
-        Logger.getLogger("org.openqa.selenium.devtools").setLevel(Level.OFF);
+        Logger.getLogger("org.openqa.selenium.devtools")
+              .setLevel(Level.OFF);
 
-        Logger.getLogger(Logger.GLOBAL_LOGGER_NAME).setLevel(Level.OFF);
+        Logger.getLogger(Logger.GLOBAL_LOGGER_NAME)
+              .setLevel(Level.OFF);
     }
 }
