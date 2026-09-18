@@ -1,8 +1,6 @@
 package testRunner;
 
 import java.io.File;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -19,22 +17,29 @@ import io.cucumber.testng.AbstractTestNGCucumberTests;
 import io.cucumber.testng.CucumberOptions;
 
 @CucumberOptions(
+
     features = "src/test/resources/featureFiles",
+
     glue = { "stepDefinition", "HooksGUI" },
+
     tags = "@UI",
+
     plugin = {
         "pretty",
         "summary",
         "rerun:target/rerun-ui.txt",
         "com.aventstack.extentreports.cucumber.adapter.ExtentCucumberAdapter:"
     }
+
 )
 public class MainRunner extends AbstractTestNGCucumberTests {
 
     @Override
     @DataProvider(parallel = true)
     public Object[][] scenarios() {
+
         return super.scenarios();
+
     }
 
     @BeforeMethod(alwaysRun = true)
@@ -50,6 +55,7 @@ public class MainRunner extends AbstractTestNGCucumberTests {
             browser.substring(0, 1).toUpperCase()
                 + browser.substring(1).toLowerCase()
         );
+
     }
 
     @BeforeSuite(alwaysRun = true)
@@ -64,51 +70,6 @@ public class MainRunner extends AbstractTestNGCucumberTests {
         flushLogs(logDir);
 
         ThreadContext.put("browser", "Chrome");
-
-        String reportBaseFolder =
-            System.getProperty("user.dir") + "/Reports/ExtentReports";
-
-        String timestamp =
-            new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-
-        /*
-         * Extent Spark Report configuration
-         */
-
-        System.setProperty(
-            "basefolder.name",
-            reportBaseFolder
-        );
-
-        System.setProperty(
-            "extent.reporter.spark.start",
-            "true"
-        );
-
-        System.setProperty(
-            "extent.reporter.spark.out",
-            "SparkReport.html"
-        );
-
-        System.setProperty(
-            "extent.reporter.spark.enableOfflineMode",
-            "true"
-        );
-
-        System.setProperty(
-            "extent.reporter.spark.vieworder",
-            "dashboard,test,category,exception,author,device,log"
-        );
-
-        /*
-         * Keep timestamp information available
-         * for the execution folder.
-         */
-
-        System.setProperty(
-            "extent.execution.timestamp",
-            timestamp
-        );
     }
 
     private void flushLogs(File logDir) {
@@ -128,7 +89,9 @@ public class MainRunner extends AbstractTestNGCucumberTests {
             if (file.exists()) {
                 file.delete();
             }
+
         }
+
     }
 
     static {
@@ -144,5 +107,7 @@ public class MainRunner extends AbstractTestNGCucumberTests {
 
         Logger.getLogger(Logger.GLOBAL_LOGGER_NAME)
               .setLevel(Level.OFF);
+
     }
+
 }
