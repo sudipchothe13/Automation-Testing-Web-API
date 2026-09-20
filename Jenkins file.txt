@@ -1,0 +1,956 @@
+pipeline {
+
+    agent any
+
+    tools {
+        jdk 'JAVA_HOME'
+        maven 'Maven-3.9.9'
+    }
+
+    parameters {
+
+        string(
+            name: 'BRANCH',
+            defaultValue: 'master',
+            description: 'Git branch'
+        )
+
+        choice(
+            name: 'EXECUTION_MODE',
+            choices: [
+                'Chrome Browser',
+                'Firefox Browser',
+                'Edge Browser',
+                'Rest Assured API Test',
+                'Parallel Execution using TestNG.xml'
+            ],
+            description: 'Select the execution mode'
+        )
+
+        string(
+            name: 'TAG',
+            defaultValue: '@UI',
+            description: 'Cucumber tag'
+        )
+
+        booleanParam(
+            name: 'HEADLESS',
+            defaultValue: true,
+            description: 'Run UI tests in headless mode'
+        )
+
+        string(
+            name: 'EMAIL_TO',
+            defaultValue: 'sudipchothe1@gmail.com',
+            description: 'Enter multiple email IDs separated by comma'
+        )
+    }
+
+    environment {
+        MAVEN_OPTS = '-Xmx2048m'
+        EXECUTED_BROWSERS = 'Not detected'
+    }
+
+    stages {
+
+        stage('Checkout') {
+            steps {
+
+                deleteDir()
+
+                git(
+                    branch: "${params.BRANCH}",
+                    url: 'https://github.com/sudipchothe13/Automation-Testing-Web-API.git'
+                )
+
+                echo "=========================================="
+                echo "CHECKOUT COMPLETED"
+                echo "=========================================="
+
+                sh '''
+                    echo "Git branch:"
+                    git branch --show-current
+
+                    echo ""
+                    echo "Git commit:"
+                    git rev-parse --short HEAD
+
+                    echo ""
+                    echo "Git commit message:"
+                    git log -1 --pretty=%B
+
+                    echo ""
+                    echo "Root files:"
+                    ls -la
+                '''
+            }
+        }
+
+        stage('Verify Tools') {
+            steps {
+
+                sh '''
+                    echo "=========================================="
+                    echo "JAVA VERSION"
+                    echo "=========================================="
+
+                    java -version
+
+                    echo ""
+                    echo "=========================================="
+                    echo "MAVEN VERSION"
+                    echo "=========================================="
+
+                    mvn -version
+                '''
+            }
+        }
+
+        stage('Validate Execution Parameters') {
+            steps {
+
+                script {
+
+                    echo "=========================================="
+                    echo "VALIDATING EXECUTION PARAMETERS"
+                    echo "=========================================="
+
+                    echo "Execution Mode : ${params.EXECUTION_MODE}"
+                    echo "Tag            : ${params.TAG}"
+                    echo "Headless       : ${params.HEADLESS}"
+
+                    if (!params.TAG?.trim()) {
+                        error(
+                            "TAG cannot be empty. Please provide a valid Cucumber tag."
+                        )
+                    }
+
+                    echo ""
+                    echo "Execution parameters are valid."
+                    echo "=========================================="
+                }
+            }
+        }
+
+        stage('Find TestNG XML') {
+
+            when {
+                expression {
+                    params.EXECUTION_MODE ==
+                    'Parallel Execution using TestNG.xml'
+                }
+            }
+
+            steps {
+
+                sh '''
+                    echo "=========================================="
+                    echo "FINDING ROOT TESTNG XML"
+                    echo "=========================================="
+
+                    TESTNG_XML=$(find . \
+                        -maxdepth 1 \
+                        -type f \
+                        -name "testng.xml" \
+                        | head -1)
+
+                    if [ -z "$TESTNG_XML" ]; then
+                        echo "ERROR: Root testng.xml not found."
+                        exit 1
+                    fi
+
+                    echo "Using TestNG XML:"
+                    echo "$TESTNG_XML"
+
+                    echo ""
+                    echo "=========================================="
+                    echo "TESTNG XML CONTENT"
+                    echo "=========================================="
+
+                    cat "$TESTNG_XML"
+
+                    echo ""
+                    echo "=========================================="
+                    echo "VALIDATING TESTNG XML"
+                    echo "=========================================="
+
+                    grep -q "<suite" "$TESTNG_XML" || {
+                        echo "ERROR: <suite> not found."
+                        exit 1
+                    }
+
+                    grep -q "<test" "$TESTNG_XML" || {
+                        echo "ERROR: <test> not found."
+                        exit 1
+                    }
+
+                    grep -q "<classes>" "$TESTNG_XML" || {
+                        echo "ERROR: <classes> not found."
+                        exit 1
+                    }
+
+                    echo "TestNG XML validation successful."
+                '''
+            }
+        }
+
+        stage('Clean Previous Reports') {
+            steps {
+
+                sh '''
+                    echo "=========================================="
+                    echo "CLEANING PREVIOUS EXTENT REPORTS"
+                    echo "=========================================="
+
+                    mkdir -p Reports
+
+                    echo ""
+                    echo "Existing Reports:"
+
+                    find Reports \
+                        -maxdepth 3 \
+                        -print \
+                        | sort || true
+
+                    echo ""
+                    echo "Deleting previous UI/API Extent reports..."
+
+                    if [ -d "Reports" ]; then
+
+                        find Reports \
+                            -mindepth 1 \
+                            -maxdepth 1 \
+                            -type d \
+                            \\( \
+                                -name "UI *" \
+                                -o \
+                                -name "API *" \
+                                -o \
+                                -name "ExtentReports *" \
+                                -o \
+                                -name "Reports *" \
+                            \\) \
+                            -exec rm -rf {} +
+
+                    fi
+
+                    echo ""
+                    echo "Deleting previous Jenkins report..."
+
+                    rm -rf Reports/JenkinsReport
+
+                    echo ""
+                    echo "Cleaning Logs..."
+
+                    rm -rf Logs
+                    mkdir -p Logs
+
+                    echo ""
+                    echo "Cleaning target..."
+
+                    rm -rf target
+
+                    rm -f browser-list.txt
+
+                    echo ""
+                    echo "Reports after cleanup:"
+
+                    find Reports \
+                        -maxdepth 3 \
+                        -print \
+                        | sort || true
+
+                    echo ""
+                    echo "Reports/WordLogs has NOT been deleted."
+
+                    echo ""
+                    echo "Previous reports cleaned successfully."
+                '''
+            }
+        }
+
+        stage('Execution Configuration') {
+            steps {
+
+                echo "=========================================="
+                echo "EXECUTION CONFIGURATION"
+                echo "=========================================="
+
+                echo "Branch         : ${params.BRANCH}"
+                echo "Execution Mode : ${params.EXECUTION_MODE}"
+                echo "Tag            : ${params.TAG}"
+                echo "Headless       : ${params.HEADLESS}"
+                echo "Email          : ${params.EMAIL_TO}"
+
+                echo "=========================================="
+            }
+        }
+
+        stage('Run Chrome Tests') {
+
+            when {
+                expression {
+                    params.EXECUTION_MODE == 'Chrome Browser'
+                }
+            }
+
+            steps {
+
+                sh '''
+                    set -e
+
+                    echo "=========================================="
+                    echo "CHROME EXECUTION"
+                    echo "=========================================="
+
+                    echo "Tag:"
+                    echo "${TAG}"
+
+                    echo "Headless:"
+                    echo "${HEADLESS}"
+
+                    mvn clean test \
+                        -Dtest=testRunner.MainRunner \
+                        -Dcucumber.filter.tags="${TAG}" \
+                        -Dbrowser=chrome \
+                        -Dheadless="${HEADLESS}"
+
+                    echo "Chrome execution completed."
+
+                    echo "chrome" > browser-list.txt
+                '''
+            }
+        }
+
+        stage('Run Firefox Tests') {
+
+            when {
+                expression {
+                    params.EXECUTION_MODE == 'Firefox Browser'
+                }
+            }
+
+            steps {
+
+                sh '''
+                    set -e
+
+                    echo "=========================================="
+                    echo "FIREFOX EXECUTION"
+                    echo "=========================================="
+
+                    echo "Tag:"
+                    echo "${TAG}"
+
+                    echo "Headless:"
+                    echo "${HEADLESS}"
+
+                    mvn clean test \
+                        -Dtest=testRunner.MainRunner \
+                        -Dcucumber.filter.tags="${TAG}" \
+                        -Dbrowser=firefox \
+                        -Dheadless="${HEADLESS}"
+
+                    echo "Firefox execution completed."
+
+                    echo "firefox" > browser-list.txt
+                '''
+            }
+        }
+
+        stage('Run Edge Tests') {
+
+            when {
+                expression {
+                    params.EXECUTION_MODE == 'Edge Browser'
+                }
+            }
+
+            steps {
+
+                sh '''
+                    set -e
+
+                    echo "=========================================="
+                    echo "EDGE EXECUTION"
+                    echo "=========================================="
+
+                    echo "Tag:"
+                    echo "${TAG}"
+
+                    echo "Headless:"
+                    echo "${HEADLESS}"
+
+                    mvn clean test \
+                        -Dtest=testRunner.MainRunner \
+                        -Dcucumber.filter.tags="${TAG}" \
+                        -Dbrowser=edge \
+                        -Dheadless="${HEADLESS}"
+
+                    echo "Edge execution completed."
+
+                    echo "edge" > browser-list.txt
+                '''
+            }
+        }
+
+        stage('Run Rest Assured Tests') {
+
+            when {
+                expression {
+                    params.EXECUTION_MODE ==
+                    'Rest Assured API Test'
+                }
+            }
+
+            steps {
+
+                sh '''
+                    set -e
+
+                    echo "=========================================="
+                    echo "REST ASSURED EXECUTION"
+                    echo "=========================================="
+
+                    echo "Tag:"
+                    echo "${TAG}"
+
+                    mvn clean test \
+                        -Dtest=testRunner.APIRunner \
+                        -Dcucumber.filter.tags="${TAG}"
+
+                    echo "Rest Assured execution completed."
+
+                    echo "Rest Assured" > browser-list.txt
+                '''
+            }
+        }
+
+        stage('Run TestNG XML Parallel') {
+
+            when {
+                expression {
+                    params.EXECUTION_MODE ==
+                    'Parallel Execution using TestNG.xml'
+                }
+            }
+
+            steps {
+
+                sh '''
+                    set -e
+
+                    echo "=========================================="
+                    echo "TESTNG XML PARALLEL EXECUTION"
+                    echo "=========================================="
+
+                    TESTNG_XML=$(find . \
+                        -maxdepth 1 \
+                        -type f \
+                        -name "testng.xml" \
+                        | head -1)
+
+                    if [ -z "$TESTNG_XML" ]; then
+                        echo "ERROR: testng.xml not found."
+                        exit 1
+                    fi
+
+                    echo ""
+                    echo "Executing TestNG XML:"
+                    echo "$TESTNG_XML"
+
+                    echo ""
+                    echo "=========================================="
+                    echo "TESTNG XML"
+                    echo "=========================================="
+
+                    cat "$TESTNG_XML"
+
+                    echo ""
+                    echo "=========================================="
+                    echo "STARTING PARALLEL EXECUTION"
+                    echo "=========================================="
+
+                    mvn clean test \
+                        -Dsurefire.suiteXmlFiles="$TESTNG_XML" \
+                        -Dcucumber.filter.tags="${TAG}" \
+                        -Dheadless="${HEADLESS}"
+
+                    echo ""
+                    echo "=========================================="
+                    echo "TESTNG PARALLEL EXECUTION COMPLETED"
+                    echo "=========================================="
+
+                    echo "TestNG Parallel" > browser-list.txt
+                '''
+            }
+        }
+
+        stage('Prepare Extent Report') {
+
+            steps {
+
+                sh '''
+                    set -e
+
+                    echo "=========================================="
+                    echo "PREPARING EXTENT SPARK REPORT"
+                    echo "=========================================="
+
+                    mkdir -p Reports/JenkinsReport
+
+                    echo ""
+                    echo "=========================================="
+                    echo "REPORT DIRECTORY STRUCTURE"
+                    echo "=========================================="
+
+                    if [ -d "Reports" ]; then
+
+                        find Reports \
+                            -maxdepth 10 \
+                            -print \
+                            | sort
+
+                    else
+
+                        echo "ERROR: Reports directory does not exist."
+                        exit 1
+
+                    fi
+
+                    echo ""
+                    echo "=========================================="
+                    echo "ALL HTML FILES"
+                    echo "=========================================="
+
+                    find Reports \
+                        -type f \
+                        -name "*.html" \
+                        -print \
+                        | sort || true
+
+                    echo ""
+                    echo "=========================================="
+                    echo "SEARCHING FOR EXTENT SPARK REPORT"
+                    echo "=========================================="
+
+                    REPORT_FILE=$(find Reports \
+                        -type f \
+                        -path "*/SparkReport/Spark.html" \
+                        -print \
+                        | sort \
+                        | tail -1)
+
+                    if [ -z "$REPORT_FILE" ]; then
+
+                        echo ""
+                        echo "ERROR: EXTENT SPARK REPORT NOT FOUND."
+                        echo ""
+
+                        echo "Complete Reports directory:"
+
+                        find Reports \
+                            -maxdepth 12 \
+                            -print \
+                            | sort
+
+                        echo ""
+
+                        echo "All HTML files:"
+
+                        find . \
+                            -type f \
+                            -name "*.html" \
+                            -print \
+                            | sort
+
+                        exit 1
+                    fi
+
+                    echo ""
+                    echo "=========================================="
+                    echo "EXTENT SPARK REPORT FOUND"
+                    echo "=========================================="
+
+                    echo "Report:"
+                    echo "$REPORT_FILE"
+
+                    REPORT_DIRECTORY=$(dirname "$REPORT_FILE")
+
+                    echo ""
+                    echo "Report directory:"
+                    echo "$REPORT_DIRECTORY"
+
+                    EXECUTION_FOLDER=$(basename "$(dirname "$REPORT_DIRECTORY")")
+
+                    echo ""
+                    echo "Execution folder:"
+                    echo "$EXECUTION_FOLDER"
+
+                    echo ""
+                    echo "=========================================="
+                    echo "COPYING REPORT"
+                    echo "=========================================="
+
+                    rm -rf "Reports/JenkinsReport/$EXECUTION_FOLDER"
+
+                    cp -R "$REPORT_DIRECTORY" \
+                          "Reports/JenkinsReport/$EXECUTION_FOLDER"
+
+                    PUBLISHED="Reports/JenkinsReport/$EXECUTION_FOLDER"
+
+                    REPORT_FILENAME=$(basename "$REPORT_FILE")
+
+                    PUBLISHED_REPORT="$PUBLISHED/$REPORT_FILENAME"
+
+                    echo ""
+                    echo "Published report:"
+                    echo "$PUBLISHED_REPORT"
+
+                    if [ ! -f "$PUBLISHED_REPORT" ]; then
+
+                        echo "ERROR: Published report was not found."
+
+                        find "$PUBLISHED" \
+                            -maxdepth 10 \
+                            -print \
+                            | sort
+
+                        exit 1
+                    fi
+
+                    echo ""
+                    echo "=========================================="
+                    echo "CREATING JENKINS REPORT PAGE"
+                    echo "=========================================="
+
+                    cat > "Reports/JenkinsReport/ExtentReport.html" <<HTML
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+    <title>Automation Test Extent Report</title>
+
+    <style>
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 60px 20px;
+            background-color: #f5f5f5;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+        }
+
+        .execution {
+            color: #666;
+            font-size: 16px;
+            margin-bottom: 35px;
+        }
+
+        .report-button {
+            display: inline-block;
+            padding: 14px 30px;
+            text-decoration: none;
+            border-radius: 6px;
+            background: #2d89ef;
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .report-button:hover {
+            background: #1b5fa7;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>Automation Test Extent Report</h1>
+
+    <div class="execution">
+        Execution: ${EXECUTION_FOLDER}
+    </div>
+
+    <a class="report-button"
+       href="./${EXECUTION_FOLDER}/${REPORT_FILENAME}">
+        Open Extent Spark Report
+    </a>
+
+</body>
+</html>
+HTML
+
+                    echo ""
+                    echo "=========================================="
+                    echo "CREATING EXTENT REPORT ZIP"
+                    echo "=========================================="
+
+                    cd Reports/JenkinsReport
+
+                    rm -f ExtentReport.zip
+
+                    zip -r ExtentReport.zip \
+                        "$EXECUTION_FOLDER" > /dev/null
+
+                    echo ""
+                    echo "ZIP CREATED:"
+                    echo "Reports/JenkinsReport/ExtentReport.zip"
+
+                    echo ""
+                    echo "=========================================="
+                    echo "FINAL JENKINS REPORT STRUCTURE"
+                    echo "=========================================="
+
+                    find . \
+                        -maxdepth 10 \
+                        -print \
+                        | sort
+
+                    echo ""
+                    echo "=========================================="
+                    echo "EXTENT REPORT PREPARATION COMPLETED"
+                    echo "=========================================="
+                '''
+            }
+        }
+    }
+
+    post {
+
+        always {
+
+            echo "=========================================="
+            echo "PUBLISHING TEST RESULTS"
+            echo "=========================================="
+
+            junit(
+                testResults: '**/target/surefire-reports/*.xml',
+                allowEmptyResults: true
+            )
+
+            publishHTML(
+                target: [
+                    allowMissing: true,
+                    alwaysLinkToLastBuild: true,
+                    keepAll: true,
+                    reportDir: 'Reports/JenkinsReport',
+                    reportFiles: 'ExtentReport.html',
+                    reportName: 'Automation Test Extent Report',
+                    reportTitles: 'Automation Test Extent Report'
+                ]
+            )
+
+            archiveArtifacts(
+                artifacts: '''
+                    Reports/JenkinsReport/ExtentReport.zip,
+                    Reports/JenkinsReport/ExtentReport.html,
+                    Reports/JenkinsReport/**/*,
+                    Reports/WordLogs/**/*,
+                    Logs/**/*,
+                    target/surefire-reports/**/*,
+                    target/rerun-ui.txt,
+                    target/rerun-api.txt
+                ''',
+                allowEmptyArchive: true
+            )
+        }
+
+        success {
+
+            script {
+
+                def browserList = fileExists('browser-list.txt')
+                    ? readFile('browser-list.txt').trim()
+                    : 'Not detected'
+
+                mail(
+                    to: "${params.EMAIL_TO}",
+
+                    subject:
+                        "Automation Test Extent Report - Build #${env.BUILD_NUMBER} - SUCCESS",
+
+                    body:
+"""
+Hi Team,
+
+Please find the automation test execution details below:
+
+Automation Test Extent Report
+
+Project           : Web-API-Automation
+Build Number      : #${env.BUILD_NUMBER}
+Status             : SUCCESS
+Branch             : ${params.BRANCH}
+Cucumber Tag       : ${params.TAG}
+Execution Mode     : ${params.EXECUTION_MODE}
+Browser/Execution  : ${browserList}
+Headless           : ${params.HEADLESS}
+Build Duration     : ${currentBuild.durationString}
+
+---
+
+Automation Test Extent Report:
+
+${env.BUILD_URL}Automation_Test_Extent_Report/
+
+---
+
+Download Complete Extent Report:
+
+${env.BUILD_URL}artifact/Reports/JenkinsReport/ExtentReport.zip
+
+---
+
+Jenkins Build:
+
+${env.BUILD_URL}
+
+---
+
+Please check the Automation Test Extent Report for complete execution details.
+
+Regards,
+Sudip
+"""
+                )
+            }
+        }
+
+        failure {
+
+            script {
+
+                def browserList = fileExists('browser-list.txt')
+                    ? readFile('browser-list.txt').trim()
+                    : 'Not detected'
+
+                mail(
+                    to: "${params.EMAIL_TO}",
+
+                    subject:
+                        "Automation Test Extent Report - Build #${env.BUILD_NUMBER} - FAILED",
+
+                    body:
+"""
+Hi Team,
+
+Please find the automation test execution details below:
+
+Automation Test Extent Report
+
+Project           : Web-API-Automation
+Build Number      : #${env.BUILD_NUMBER}
+Status             : FAILED
+Branch             : ${params.BRANCH}
+Cucumber Tag       : ${params.TAG}
+Execution Mode     : ${params.EXECUTION_MODE}
+Browser/Execution  : ${browserList}
+Headless           : ${params.HEADLESS}
+Build Duration     : ${currentBuild.durationString}
+
+---
+
+Automation Test Extent Report:
+
+${env.BUILD_URL}Automation_Test_Extent_Report/
+
+---
+
+Download Complete Extent Report:
+
+${env.BUILD_URL}artifact/Reports/JenkinsReport/ExtentReport.zip
+
+---
+
+Jenkins Build:
+
+${env.BUILD_URL}
+
+---
+
+Please check the Jenkins console and Automation Test Extent Report for complete execution details.
+
+Regards,
+Sudip
+"""
+                )
+            }
+        }
+
+        unstable {
+
+            script {
+
+                def browserList = fileExists('browser-list.txt')
+                    ? readFile('browser-list.txt').trim()
+                    : 'Not detected'
+
+                mail(
+                    to: "${params.EMAIL_TO}",
+
+                    subject:
+                        "Automation Test Extent Report - Build #${env.BUILD_NUMBER} - UNSTABLE",
+
+                    body:
+"""
+Hi Team,
+
+Please find the automation test execution details below:
+
+Automation Test Extent Report
+
+Project           : Web-API-Automation
+Build Number      : #${env.BUILD_NUMBER}
+Status             : UNSTABLE
+Branch             : ${params.BRANCH}
+Cucumber Tag       : ${params.TAG}
+Execution Mode     : ${params.EXECUTION_MODE}
+Browser/Execution  : ${browserList}
+Headless           : ${params.HEADLESS}
+Build Duration     : ${currentBuild.durationString}
+
+---
+
+Automation Test Extent Report:
+
+${env.BUILD_URL}Automation_Test_Extent_Report/
+
+---
+
+Download Complete Extent Report:
+
+${env.BUILD_URL}artifact/Reports/JenkinsReport/ExtentReport.zip
+
+---
+
+Jenkins Build:
+
+${env.BUILD_URL}
+
+---
+
+Please check the Jenkins console and Automation Test Extent Report for complete execution details.
+
+Regards,
+Sudip
+"""
+                )
+            }
+        }
+    }
+}
+
+-------------------------------------------
+
+Settings ---> Script console ---> run below command
+
+System.setProperty(
+    "hudson.model.DirectoryBrowserSupport.CSP",
+    ""
+)
