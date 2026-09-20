@@ -70,6 +70,17 @@ public class MainRunner extends AbstractTestNGCucumberTests {
         flushLogs(logDir);
 
         ThreadContext.put("browser", "Chrome");
+
+        // Delete old UI and API Extent reports
+        File reportsDir = new File("Reports");
+
+        deleteReportFolders(reportsDir);
+
+        // Set UI ExtentReports base path
+        System.setProperty(
+            "basefolder.name",
+            System.getProperty("user.dir") + "/Reports/UI"
+        );
     }
 
     private void flushLogs(File logDir) {
@@ -92,6 +103,45 @@ public class MainRunner extends AbstractTestNGCucumberTests {
 
         }
 
+    }
+
+    private void deleteReportFolders(File reportsDir) {
+
+        if (!reportsDir.exists()) {
+            return;
+        }
+
+        File[] files = reportsDir.listFiles();
+
+        if (files != null) {
+
+            for (File file : files) {
+
+                if (file.isDirectory()
+                        && (file.getName().startsWith("UI")
+                        || file.getName().startsWith("API"))) {
+
+                    deleteFolder(file);
+                }
+            }
+        }
+    }
+
+    private void deleteFolder(File file) {
+
+        if (file.isDirectory()) {
+
+            File[] files = file.listFiles();
+
+            if (files != null) {
+
+                for (File child : files) {
+                    deleteFolder(child);
+                }
+            }
+        }
+
+        file.delete();
     }
 
     static {

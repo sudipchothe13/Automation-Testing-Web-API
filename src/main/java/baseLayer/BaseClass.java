@@ -120,10 +120,13 @@ public class BaseClass {
                 .replaceAll("(Authorization: Bearer )(.*)", "$1********");
         String responseLog = responseOutputStream.get().toString();
 
-        Log.info("========== API SCENARIO START ==========");
-        Log.info("REQUEST:\n" + requestLog);
-        Log.info("RESPONSE:\n" + responseLog);
-        Log.info("========== API SCENARIO END ==========\n");
+ //       Log.info("========== API SCENARIO START ==========");
+          Log.info("--------------------- Request Logs started: ---------------------\n" + requestLog);
+          Log.info("--------------------- Response Logs started: ---------------------\n" + responseLog);
+ //       Log.info("========== API SCENARIO END ==========\n");
+        
+ //        Log.info("---------------------------------------- Request Logs----------------------------------------\n" + requestLog); 
+ //        Log.info("---------------------------------------- Response Logs----------------------------------------\n" + responseLog);
     }
 
     // ====================== GETTERS FOR REPORTS ======================

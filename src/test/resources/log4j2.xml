@@ -61,7 +61,7 @@
                     </RollingFile>
                 </Route>
 
-                <Route key="REST">
+                <Route key="RestAssuredLogs">
                     <RollingFile
                         name="RestFile"
                         fileName="Logs/RestAssured.log"

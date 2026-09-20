@@ -25,7 +25,7 @@ public class HooksAPI extends BaseClass {
         // 🔥 API runner decides this
         ThreadContext.put("browser", "RestAssuredLogs");
 
-        Log.info("========== API Scenario START: " + scenario.getName() + " ==========");
+        Log.info("==================== API Scenario START: " + scenario.getName() + " ====================");
     }
 
 
@@ -38,9 +38,10 @@ public class HooksAPI extends BaseClass {
         ExtentCucumberAdapter.getCurrentStep()
                 .log(Status.INFO, "<pre>" + BaseClass.getResponseLog() + "</pre>");
 
-        Log.info("==================== API Scenario END : " 
-                 + scenario.getName() + " ====================");
+        Log.info("==================== API Scenario END : " + scenario.getName() + " ====================");
 
+        Log.info("=======================================================================================");
+        
         // ✅ Clear ThreadContext ONLY ONCE
         BaseClass.clearRestLogging();
     }
