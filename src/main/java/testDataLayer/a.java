@@ -7,6 +7,6 @@ public class a {
 	//master branch------cftvghu
 	
 	public void m1() {
-		int a = 15;
+		int a = 10;
 	}
 }
