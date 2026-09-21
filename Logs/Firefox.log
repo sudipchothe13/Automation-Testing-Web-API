@@ -1,0 +1,12 @@
+2026-09-21 09:41:00 INFO  [Automation Testing] [Firefox] Initializing browser: firefox
+2026-09-21 09:41:02 INFO  [Automation Testing] [Firefox] Browser launched successfully: firefox
+2026-09-21 09:41:03 INFO  [Automation Testing] [Firefox] ========== UI Scenario START ==========
+2026-09-21 09:41:03 INFO  [Automation Testing] [Firefox] Scenario : OrangeHRM Login
+2026-09-21 09:41:03 INFO  [Automation Testing] [Firefox] Browser  : FIREFOX
+2026-09-21 09:41:03 INFO  [Automation Testing] [Firefox] =======================================
+2026-09-21 09:41:07 INFO  [Automation Testing] [Firefox] Application launched
+2026-09-21 09:41:12 INFO  [Automation Testing] [Firefox] User Entered Username
+2026-09-21 09:41:12 INFO  [Automation Testing] [Firefox] User Entered Password
+2026-09-21 09:41:14 INFO  [Automation Testing] [Firefox] User clicked on Login button
+2026-09-21 09:41:17 INFO  [Automation Testing] [Firefox] User successfully navigated to Dashboard
+2026-09-21 09:41:21 INFO  [Automation Testing] [Firefox] ========== UI Scenario END ==========
