@@ -8,7 +8,6 @@ public class a {
 		int b =15;
 		int shubham = 10;
 		int sudip = 25;
-		
 		String sudip1 = "sudip";
 		
 	}
