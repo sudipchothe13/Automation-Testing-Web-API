@@ -8,11 +8,10 @@ import org.apache.logging.log4j.ThreadContext;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.DataProvider;
-import org.testng.annotations.Optional;
-import org.testng.annotations.Parameters;
 
 import baseLayer.BaseClass;
 import baseLayer.BrowserManager;
+import configLayer.ConfigReader;
 import io.cucumber.testng.AbstractTestNGCucumberTests;
 import io.cucumber.testng.CucumberOptions;
 
@@ -34,30 +33,46 @@ import io.cucumber.testng.CucumberOptions;
 )
 public class MainRunner extends AbstractTestNGCucumberTests {
 
+    // ================== PARALLEL EXECUTION ==================
     @Override
     @DataProvider(parallel = true)
     public Object[][] scenarios() {
 
         return super.scenarios();
-
     }
 
+    // ================== BROWSER CONFIGURATION ==================
     @BeforeMethod(alwaysRun = true)
-    @Parameters("browser")
-    public void setBrowser(@Optional("chrome") String browser) {
+    public void setBrowser() {
+
+        // Jenkins -Dbrowser has priority
+        String browser = System.getProperty("browser");
+
+        // If Jenkins browser is not provided,
+        // use browser from Config.properties
+        if (browser == null || browser.trim().isEmpty()) {
+            browser = ConfigReader.get("browser");
+        }
+
+        // Final fallback
+        if (browser == null || browser.trim().isEmpty()) {
+            browser = "chrome";
+        }
+
+        browser = browser.trim().toLowerCase();
 
         BrowserManager.setBrowser(browser);
 
-        BaseClass.setBrowser(browser.toLowerCase());
+        BaseClass.setBrowser(browser);
 
         ThreadContext.put(
-            "browser",
-            browser.substring(0, 1).toUpperCase()
-                + browser.substring(1).toLowerCase()
+                "browser",
+                browser.substring(0, 1).toUpperCase()
+                        + browser.substring(1).toLowerCase()
         );
-
     }
 
+    // ================== EXTENT REPORT SETUP ==================
     @BeforeSuite(alwaysRun = true)
     public void setupExtentReport() {
 
@@ -69,8 +84,6 @@ public class MainRunner extends AbstractTestNGCucumberTests {
 
         flushLogs(logDir);
 
-        ThreadContext.put("browser", "Chrome");
-
         // Delete old UI and API Extent reports
         File reportsDir = new File("Reports");
 
@@ -78,19 +91,20 @@ public class MainRunner extends AbstractTestNGCucumberTests {
 
         // Set UI ExtentReports base path
         System.setProperty(
-            "basefolder.name",
-            System.getProperty("user.dir") + "/Reports/UI"
+                "basefolder.name",
+                System.getProperty("user.dir") + "/Reports/UI"
         );
     }
 
+    // ================== DELETE OLD LOG FILES ==================
     private void flushLogs(File logDir) {
 
         String[] logFiles = {
-            "Chrome.log",
-            "Firefox.log",
-            "Edge.log",
-            "RestAssured.log",
-            "Default.log"
+                "Chrome.log",
+                "Firefox.log",
+                "Edge.log",
+                "RestAssured.log",
+                "Default.log"
         };
 
         for (String fileName : logFiles) {
@@ -100,11 +114,10 @@ public class MainRunner extends AbstractTestNGCucumberTests {
             if (file.exists()) {
                 file.delete();
             }
-
         }
-
     }
 
+    // ================== DELETE OLD REPORT FOLDERS ==================
     private void deleteReportFolders(File reportsDir) {
 
         if (!reportsDir.exists()) {
@@ -127,6 +140,7 @@ public class MainRunner extends AbstractTestNGCucumberTests {
         }
     }
 
+    // ================== DELETE FOLDER ==================
     private void deleteFolder(File file) {
 
         if (file.isDirectory()) {
@@ -144,20 +158,19 @@ public class MainRunner extends AbstractTestNGCucumberTests {
         file.delete();
     }
 
+    // ================== SELENIUM LOGGING ==================
     static {
 
         Logger.getLogger("org.openqa.selenium")
-              .setLevel(Level.OFF);
+                .setLevel(Level.OFF);
 
         Logger.getLogger("org.openqa.selenium.remote")
-              .setLevel(Level.OFF);
+                .setLevel(Level.OFF);
 
         Logger.getLogger("org.openqa.selenium.devtools")
-              .setLevel(Level.OFF);
+                .setLevel(Level.OFF);
 
         Logger.getLogger(Logger.GLOBAL_LOGGER_NAME)
-              .setLevel(Level.OFF);
-
+                .setLevel(Level.OFF);
     }
-
 }
