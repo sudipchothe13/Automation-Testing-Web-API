@@ -3,15 +3,14 @@
 <suite name="Failed suite [Default suite]" guice-stage="DEVELOPMENT">
   <test thread-count="5" name="Default test(failed)">
     <classes>
-      <class name="testRunner.MainRunner">
+      <class name="testRunner.APIRunner">
         <methods>
           <include name="setUpClass"/>
-          <include name="setBrowser"/>
-          <include name="runScenario" invocation-numbers="0"/>
+          <include name="setupAPI"/>
           <include name="tearDownClass"/>
-          <include name="setupExtentReport"/>
+          <include name="runScenario" invocation-numbers="0"/>
         </methods>
-      </class> <!-- testRunner.MainRunner -->
+      </class> <!-- testRunner.APIRunner -->
     </classes>
   </test> <!-- Default test(failed) -->
 </suite> <!-- Failed suite [Default suite] -->

@@ -12,7 +12,8 @@ import io.cucumber.testng.CucumberOptions;
 @CucumberOptions(
         features = "src/test/resources/featureFiles",
         glue = { "stepDefinition", "HooksAPI" },
-        tags = "@Company",
+        dryRun = true,
+        tags = "@MyDetails",
         plugin = {
                 "pretty",
                 "rerun:target/rerun-api.txt",

@@ -1,0 +1,38 @@
+{
+  "id": 101,
+  "name": "Sudip",
+  "salary": 25000.50,
+  "active": true,
+  "middleName": null,
+
+  "address": {
+    "city": "Pune",
+    "pincode": 411001
+  },
+
+  "skills": [
+    "Java",
+    "Selenium",
+    "Rest Assured"
+  ],
+
+  "experience": [5, 6, 7.8],
+
+  "projects": [
+    {
+      "id": 1,
+      "name": "HSBC",
+      "active": true
+    },
+    {
+      "id": 2,
+      "name": "Billing",
+      "active": false
+    }
+  ],
+
+  "contact": {
+    "email": "test@gmail.com",
+    "phone": "9876543210"
+  }
+}
