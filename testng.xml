@@ -18,5 +18,12 @@
             <class name="testRunner.MainRunner"/>
         </classes>
     </test>
+    
+     <test name="Firefox">
+        <parameter name="browser" value="firefoc"/>
+        <classes>
+            <class name="testRunner.MainRunner"/>
+        </classes>
+    </test>
 
 </suite>
