@@ -121,8 +121,8 @@ public class BaseClass {
         String responseLog = responseOutputStream.get().toString();
 
  //       Log.info("========== API SCENARIO START ==========");
-          Log.info("--------------------- Request Logs started: ---------------------\n" + requestLog);
-          Log.info("--------------------- Response Logs started: ---------------------\n" + responseLog);
+          Log.info("--------------------- Request Logs started: --------------------\n" + requestLog);
+          Log.info("--------------------- Response Logs started: -------------------\n" + responseLog);
  //       Log.info("========== API SCENARIO END ==========\n");
         
  //        Log.info("---------------------------------------- Request Logs----------------------------------------\n" + requestLog); 

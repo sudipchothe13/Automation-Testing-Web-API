@@ -42,16 +42,21 @@ public class UIHooks {
                 scenario.getName()
         );
 
+        
+        Log.info("------------- UI Scenario START --------------");
+
+        Log.info("Scenario : " + scenario.getName());
+
+        Log.info("Browser launched successfully: " + browser.toUpperCase());
+        
         ScreenshotUtils.capture(
                 driver,
                 "Browser launched successfully: "
                         + browser.toUpperCase()
         );
+        
 
-        Log.info("========== UI Scenario START ==========");
-        Log.info("Scenario : " + scenario.getName());
-        Log.info("Browser  : " + browser.toUpperCase());
-        Log.info("=======================================");
+        Log.info("----------------------------------------------");
     }
 
     // ================== AFTER SCENARIO ==================
@@ -72,7 +77,7 @@ public class UIHooks {
             driver.quit();
         }
 
-        Log.info("========== UI Scenario END ==========");
+        Log.info("*************** UI Scenario END **************");
 
         WordLogger.endScenario();
 

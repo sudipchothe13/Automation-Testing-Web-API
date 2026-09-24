@@ -89,13 +89,12 @@ public class DriverFactory {
          * Jenkins      = Jenkins execution
          * Local Machine = Eclipse / Local execution
          */
-        
+
         String executionEnvironment =
                 System.getenv("JENKINS_URL") != null
                         ? "Jenkins"
                         : "Local Machine";
 
-        Log.info("Execution Environment : " + executionEnvironment);
 
         /*
          * =========================
@@ -154,12 +153,16 @@ public class DriverFactory {
          * =========================
          */
 
-        Log.info("==========================================");
-        Log.info("Browser        : " + configuredBrowser);
-        Log.info("Execution Mode : " + executionMode);
-        Log.info("Headless       : " + headless);
-        Log.info("Incognito      : " + incognito);
-        Log.info("==========================================");
+        Log.info("**********************************************");
+
+        Log.info("Environment : " + formatValue(executionEnvironment)
+                + " | Mode : " + formatValue(executionMode));
+        
+        Log.info("Execution  : UI"
+                + " | Browser : " + formatValue(configuredBrowser));
+
+        Log.info("Headless   : " + formatValue(headless)
+                + " | Incognito : " + formatValue(incognito));
 
 
         WebDriver driver;
@@ -281,6 +284,7 @@ public class DriverFactory {
         BaseClass.setBrowser(configuredBrowser);
 
 
+        /*
         Log.info(
                 "Browser launched successfully: "
                         + configuredBrowser
@@ -288,6 +292,7 @@ public class DriverFactory {
                         + executionMode
         );
 
+        */
 
         return driver;
     }
@@ -741,5 +746,17 @@ public class DriverFactory {
             );
         }
     }
-}
 
+
+    // =========================================================
+    // FORMAT LOG VALUE
+    // =========================================================
+
+    private static String formatValue(Object value) {
+
+        String text = String.valueOf(value);
+
+        return text.substring(0, 1).toUpperCase()
+                + text.substring(1).toLowerCase();
+    }
+}
