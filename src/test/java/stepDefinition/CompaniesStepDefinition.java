@@ -66,6 +66,7 @@ public class CompaniesStepDefinition extends BaseClass{
 
 	@Then("Response status code should be {int}")
 	public void response_status_code_should_be(Integer statusCode) {
+		Assert.assertEquals(100, 200);
 		Log.info("7");
 		Assert.assertEquals(response.getStatusCode(), statusCode.intValue());
 		Log.info("8");

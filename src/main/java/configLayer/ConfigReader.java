@@ -1,7 +1,6 @@
 package configLayer;
 
 import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
@@ -13,15 +12,22 @@ public class ConfigReader {
 
         try {
 
+            /*
+             * First try config.properties from classpath
+             */
             InputStream inputStream =
                     ConfigReader.class
                             .getClassLoader()
                             .getResourceAsStream("config.properties");
 
+            /*
+             * If not found in classpath,
+             * try src/test/resources/config.properties
+             */
             if (inputStream == null) {
 
-                throw new RuntimeException(
-                        "config.properties file not found in src/test/resources"
+                inputStream = new FileInputStream(
+                        "src/test/resources/config.properties"
                 );
             }
 
@@ -29,31 +35,59 @@ public class ConfigReader {
 
             inputStream.close();
 
-        } catch (IOException e) {
+        } catch (Exception e) {
 
-            throw new RuntimeException(
-                    "Unable to load config.properties",
-                    e
+            /*
+             * Do not fail the complete framework during
+             * class initialization if properties file
+             * is unavailable.
+             *
+             * System properties passed from Jenkins/Maven
+             * can still be used.
+             */
+
+            System.out.println(
+                    "WARNING: config.properties could not be loaded."
+            );
+
+            System.out.println(
+                    "ConfigReader will use system properties/default values."
             );
         }
     }
 
+
+    // =========================================================
+    // GET PROPERTY
+    // =========================================================
+
     public static String get(String key) {
 
         if (key == null || key.trim().isEmpty()) {
+
             return null;
         }
 
+
         /*
-         * Jenkins / Maven -D property gets priority.
+         * Jenkins / Maven system property gets priority.
          *
          * Example:
+         *
          * mvn test -Dbrowser=edge
          *
-         * This allows Jenkins parameters to override
-         * config.properties without changing the file.
+         * System property:
+         * edge
+         *
+         * config.properties:
+         * chrome
+         *
+         * Result:
+         * edge
          */
-        String systemProperty = System.getProperty(key);
+
+        String systemProperty =
+                System.getProperty(key);
 
         if (systemProperty != null
                 && !systemProperty.trim().isEmpty()) {
@@ -61,25 +95,46 @@ public class ConfigReader {
             return systemProperty.trim();
         }
 
-        String value = properties.getProperty(key);
+
+        /*
+         * Otherwise read from properties file.
+         */
+
+        String value =
+                properties.getProperty(key);
 
         if (value == null) {
+
             return null;
         }
 
         return value.trim();
     }
 
-    public static String get(String key, String defaultValue) {
+
+    // =========================================================
+    // GET PROPERTY WITH DEFAULT VALUE
+    // =========================================================
+
+    public static String get(
+            String key,
+            String defaultValue) {
 
         String value = get(key);
 
-        if (value == null || value.isEmpty()) {
+        if (value == null
+                || value.trim().isEmpty()) {
+
             return defaultValue;
         }
 
         return value;
     }
+
+
+    // =========================================================
+    // GET BOOLEAN
+    // =========================================================
 
     public static boolean getBoolean(
             String key,
@@ -87,12 +142,21 @@ public class ConfigReader {
 
         String value = get(key);
 
-        if (value == null || value.isEmpty()) {
+        if (value == null
+                || value.trim().isEmpty()) {
+
             return defaultValue;
         }
 
-        return Boolean.parseBoolean(value);
+        return Boolean.parseBoolean(
+                value.trim()
+        );
     }
+
+
+    // =========================================================
+    // GET INTEGER
+    // =========================================================
 
     public static int getInt(
             String key,
@@ -100,13 +164,17 @@ public class ConfigReader {
 
         String value = get(key);
 
-        if (value == null || value.isEmpty()) {
+        if (value == null
+                || value.trim().isEmpty()) {
+
             return defaultValue;
         }
 
         try {
 
-            return Integer.parseInt(value);
+            return Integer.parseInt(
+                    value.trim()
+            );
 
         } catch (NumberFormatException e) {
 

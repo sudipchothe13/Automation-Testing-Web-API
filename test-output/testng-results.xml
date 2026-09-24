@@ -1,31 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testng-results ignored="0" total="2" passed="2" failed="0" skipped="0">
+<testng-results ignored="0" total="2" passed="0" failed="2" skipped="0">
   <reporter-output>
   </reporter-output>
-  <suite started-at="2026-09-24T12:01:34 IST" name="Default suite" finished-at="2026-09-24T12:01:35 IST" duration-ms="638">
+  <suite started-at="2026-09-24T17:16:09 IST" name="Default suite" finished-at="2026-09-24T17:16:10 IST" duration-ms="635">
     <groups>
       <group name="cucumber">
         <method signature="AbstractTestNGCucumberTests.runScenario(io.cucumber.testng.PickleWrapper,io.cucumber.testng.FeatureWrapper)[pri:0, instance:testRunner.APIRunner@4a668b6e]" name="runScenario" class="io.cucumber.testng.AbstractTestNGCucumberTests"/>
       </group> <!-- cucumber -->
     </groups>
-    <test started-at="2026-09-24T12:01:34 IST" name="Default test" finished-at="2026-09-24T12:01:35 IST" duration-ms="638">
+    <test started-at="2026-09-24T17:16:09 IST" name="Default test" finished-at="2026-09-24T17:16:10 IST" duration-ms="635">
       <class name="testRunner.APIRunner">
-        <test-method is-config="true" signature="setupAPI()[pri:0, instance:testRunner.APIRunner@4a668b6e]" started-at="2026-09-24T12:01:34 IST" name="setupAPI" finished-at="2026-09-24T12:01:34 IST" duration-ms="138" status="PASS">
+        <test-method is-config="true" signature="setupAPI()[pri:0, instance:testRunner.APIRunner@4a668b6e]" started-at="2026-09-24T17:16:09 IST" name="setupAPI" finished-at="2026-09-24T17:16:09 IST" duration-ms="125" status="PASS">
           <reporter-output>
           </reporter-output>
         </test-method> <!-- setupAPI -->
-        <test-method is-config="true" signature="setUpClass(org.testng.ITestContext)[pri:0, instance:testRunner.APIRunner@4a668b6e]" started-at="2026-09-24T12:01:34 IST" name="setUpClass" finished-at="2026-09-24T12:01:34 IST" duration-ms="106" status="PASS">
+        <test-method is-config="true" signature="setUpClass(org.testng.ITestContext)[pri:0, instance:testRunner.APIRunner@4a668b6e]" started-at="2026-09-24T17:16:09 IST" name="setUpClass" finished-at="2026-09-24T17:16:09 IST" duration-ms="99" status="PASS">
           <params>
             <param index="0">
               <value>
-                <![CDATA[org.testng.TestRunner@5aa7cfdf]]>
+                <![CDATA[org.testng.TestRunner@324e8baa]]>
               </value>
             </param>
           </params>
           <reporter-output>
           </reporter-output>
         </test-method> <!-- setUpClass -->
-        <test-method signature="runScenario(io.cucumber.testng.PickleWrapper,io.cucumber.testng.FeatureWrapper)[pri:0, instance:testRunner.APIRunner@4a668b6e]" started-at="2026-09-24T12:01:34 IST" name="runScenario" description="Runs Cucumber Scenarios" data-provider="scenarios" finished-at="2026-09-24T12:01:35 IST" duration-ms="436" status="PASS">
+        <test-method signature="runScenario(io.cucumber.testng.PickleWrapper,io.cucumber.testng.FeatureWrapper)[pri:0, instance:testRunner.APIRunner@4a668b6e]" started-at="2026-09-24T17:16:09 IST" name="runScenario" description="Runs Cucumber Scenarios" data-provider="scenarios" finished-at="2026-09-24T17:16:09 IST" duration-ms="424" status="FAIL">
           <params>
             <param index="0">
               <value>
@@ -38,10 +38,28 @@
               </value>
             </param>
           </params>
+          <exception class="java.lang.AssertionError">
+            <message>
+              <![CDATA[expected [200] but found [100]]]>
+            </message>
+            <full-stacktrace>
+              <![CDATA[java.lang.AssertionError: expected [200] but found [100]
+at org.testng.Assert.fail(Assert.java:111)
+at org.testng.Assert.failNotEquals(Assert.java:1578)
+at org.testng.Assert.assertEqualsImpl(Assert.java:150)
+at org.testng.Assert.assertEquals(Assert.java:132)
+at org.testng.Assert.assertEquals(Assert.java:1419)
+at org.testng.Assert.assertEquals(Assert.java:1383)
+at org.testng.Assert.assertEquals(Assert.java:1429)
+at stepDefinition.CompaniesStepDefinition.response_status_code_should_be(CompaniesStepDefinition.java:69)
+at ✽.Response status code should be 201(file:///Users/sudipdilipchothe/eclipse-workspace/Web-API-Automation/src/test/resources/featureFiles/API_Automation.feature:7)
+]]>
+            </full-stacktrace>
+          </exception> <!-- java.lang.AssertionError -->
           <reporter-output>
           </reporter-output>
         </test-method> <!-- runScenario -->
-        <test-method signature="runScenario(io.cucumber.testng.PickleWrapper,io.cucumber.testng.FeatureWrapper)[pri:0, instance:testRunner.APIRunner@4a668b6e]" started-at="2026-09-24T12:01:35 IST" name="runScenario" description="Runs Cucumber Scenarios" data-provider="scenarios" finished-at="2026-09-24T12:01:35 IST" duration-ms="14" status="PASS">
+        <test-method signature="runScenario(io.cucumber.testng.PickleWrapper,io.cucumber.testng.FeatureWrapper)[pri:0, instance:testRunner.APIRunner@4a668b6e]" started-at="2026-09-24T17:16:09 IST" name="runScenario" description="Runs Cucumber Scenarios" data-provider="scenarios" finished-at="2026-09-24T17:16:09 IST" duration-ms="18" status="FAIL">
           <params>
             <param index="0">
               <value>
@@ -54,10 +72,28 @@
               </value>
             </param>
           </params>
+          <exception class="java.lang.AssertionError">
+            <message>
+              <![CDATA[expected [200] but found [100]]]>
+            </message>
+            <full-stacktrace>
+              <![CDATA[java.lang.AssertionError: expected [200] but found [100]
+at org.testng.Assert.fail(Assert.java:111)
+at org.testng.Assert.failNotEquals(Assert.java:1578)
+at org.testng.Assert.assertEqualsImpl(Assert.java:150)
+at org.testng.Assert.assertEquals(Assert.java:132)
+at org.testng.Assert.assertEquals(Assert.java:1419)
+at org.testng.Assert.assertEquals(Assert.java:1383)
+at org.testng.Assert.assertEquals(Assert.java:1429)
+at stepDefinition.CompaniesStepDefinition.response_status_code_should_be(CompaniesStepDefinition.java:69)
+at ✽.Response status code should be 200(file:///Users/sudipdilipchothe/eclipse-workspace/Web-API-Automation/src/test/resources/featureFiles/API_Automation.feature:13)
+]]>
+            </full-stacktrace>
+          </exception> <!-- java.lang.AssertionError -->
           <reporter-output>
           </reporter-output>
         </test-method> <!-- runScenario -->
-        <test-method is-config="true" signature="tearDownClass()[pri:0, instance:testRunner.APIRunner@4a668b6e]" started-at="2026-09-24T12:01:35 IST" name="tearDownClass" finished-at="2026-09-24T12:01:35 IST" duration-ms="74" status="PASS">
+        <test-method is-config="true" signature="tearDownClass()[pri:0, instance:testRunner.APIRunner@4a668b6e]" started-at="2026-09-24T17:16:09 IST" name="tearDownClass" finished-at="2026-09-24T17:16:10 IST" duration-ms="84" status="PASS">
           <reporter-output>
           </reporter-output>
         </test-method> <!-- tearDownClass -->
