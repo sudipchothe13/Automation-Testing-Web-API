@@ -81,6 +81,21 @@ public class DriverFactory {
                         "local"
                 ).toLowerCase();
 
+        /*
+         * =========================
+         * EXECUTION ENVIRONMENT
+         * =========================
+         *
+         * Jenkins      = Jenkins execution
+         * Local Machine = Eclipse / Local execution
+         */
+        
+        String executionEnvironment =
+                System.getenv("JENKINS_URL") != null
+                        ? "Jenkins"
+                        : "Local Machine";
+
+        Log.info("Execution Environment : " + executionEnvironment);
 
         /*
          * =========================
