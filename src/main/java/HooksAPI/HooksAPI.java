@@ -12,17 +12,10 @@ import io.cucumber.java.Before;
 import io.cucumber.java.Scenario;
 
 public class HooksAPI extends BaseClass {
-
-//    @Before
-//    public void beforeScenario(Scenario scenario) {
-//        BaseClass.initRestLogging(); // Set logging to REST
-//        Log.info("==================== API Scenario START: " + scenario.getName() + " ====================");
-//    }
-    
     @Before
     public void beforeScenario(Scenario scenario) {
 
-        // 🔥 API runner decides this
+        // ðŸ”¥ API runner decides this
         ThreadContext.put("browser", "RestAssuredLogs");
 
         Log.info("==================== API Scenario START: " + scenario.getName() + " ====================");
@@ -32,7 +25,7 @@ public class HooksAPI extends BaseClass {
     @After
     public void afterScenario(Scenario scenario) {
 
-        // ✅ Attach API logs to Extent
+        // âœ… Attach API logs to Extent
         ExtentCucumberAdapter.getCurrentStep()
                 .log(Status.INFO, "<pre>" + BaseClass.getRequestLog() + "</pre>");
         ExtentCucumberAdapter.getCurrentStep()
@@ -42,8 +35,41 @@ public class HooksAPI extends BaseClass {
 
         Log.info("=======================================================================================");
         
-        // ✅ Clear ThreadContext ONLY ONCE
+        // âœ… Clear ThreadContext ONLY ONCE
         BaseClass.clearRestLogging();
     }
+    
+//    @Before
+//    public void beforeScenario(Scenario scenario) {
+//        BaseClass.initRestLogging(); // Set logging to REST
+//        Log.info("==================== API Scenario START: " + scenario.getName() + " ====================");
+//    }
+    
+//    @Before
+//    public void beforeScenario(Scenario scenario) {
+//
+//        // 🔥 API runner decides this
+//        ThreadContext.put("browser", "RestAssuredLogs");
+//
+//        Log.info("==================== API Scenario START: " + scenario.getName() + " ====================");
+//    }
+//
+//
+//    @After
+//    public void afterScenario(Scenario scenario) {
+//
+//        // ✅ Attach API logs to Extent
+//        ExtentCucumberAdapter.getCurrentStep()
+//                .log(Status.INFO, "<pre>" + BaseClass.getRequestLog() + "</pre>");
+//        ExtentCucumberAdapter.getCurrentStep()
+//                .log(Status.INFO, "<pre>" + BaseClass.getResponseLog() + "</pre>");
+//
+//        Log.info("==================== API Scenario END : " + scenario.getName() + " ====================");
+//
+//        Log.info("=======================================================================================");
+//        
+//        // ✅ Clear ThreadContext ONLY ONCE
+//        BaseClass.clearRestLogging();
+//    }
 
 }

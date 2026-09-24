@@ -12,8 +12,7 @@ import io.cucumber.testng.CucumberOptions;
 @CucumberOptions(
         features = "src/test/resources/featureFiles",
         glue = { "stepDefinition", "HooksAPI" },
-        dryRun = true,
-        tags = "@MyDetails",
+        tags = "@Company",
         plugin = {
                 "pretty",
                 "rerun:target/rerun-api.txt",
@@ -24,14 +23,14 @@ public class APIRunner extends AbstractTestNGCucumberTests {
     @BeforeSuite(alwaysRun = true)
     public void setupAPI() {
 
-        // 1️⃣ Create Logs folder if it doesn't exist
+        // 1ï¸âƒ£ Create Logs folder if it doesn't exist
         File logDir = new File("Logs");
 
         if (!logDir.exists()) {
             logDir.mkdirs();
         }
 
-        // 2️⃣ Delete all existing log files to start fresh
+        // 2ï¸âƒ£ Delete all existing log files to start fresh
         File[] files = logDir.listFiles();
 
         if (files != null) {
@@ -44,18 +43,18 @@ public class APIRunner extends AbstractTestNGCucumberTests {
             }
         }
 
-        // 3️⃣ Set ThreadContext so Log4j routing appender picks REST
+        // 3ï¸âƒ£ Set ThreadContext so Log4j routing appender picks REST
         ThreadContext.put("browser", "REST");
 
-        // 4️⃣ Log the start of API suite
+        // 4ï¸âƒ£ Log the start of API suite
         Log.info("===== API Test Suite Started =====");
 
-        // 5️⃣ Delete old UI and API Extent reports
+        // 5ï¸âƒ£ Delete old UI and API Extent reports
         File reportsDir = new File("Reports");
 
         deleteReportFolders(reportsDir);
 
-        // 6️⃣ Set API ExtentReports base path
+        // 6ï¸âƒ£ Set API ExtentReports base path
         System.setProperty(
                 "basefolder.name",
                 System.getProperty("user.dir") + "/Reports/API"
