@@ -1,31 +1,117 @@
 package configLayer;
 
 import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Properties;
 
-public final class ConfigReader {
+public class ConfigReader {
 
-    private static final Properties prop = new Properties();
-
-    private ConfigReader() {
-    }
+    private static final Properties properties = new Properties();
 
     static {
+
         try {
-            FileInputStream fis = new FileInputStream(
-                    System.getProperty("user.dir")
-                    + "/src/main/java/ConfigLayer/Config.properties");
 
-            prop.load(fis);
-            fis.close();
+            InputStream inputStream =
+                    ConfigReader.class
+                            .getClassLoader()
+                            .getResourceAsStream("config.properties");
 
-        } catch (Exception e) {
+            if (inputStream == null) {
+
+                throw new RuntimeException(
+                        "config.properties file not found in src/test/resources"
+                );
+            }
+
+            properties.load(inputStream);
+
+            inputStream.close();
+
+        } catch (IOException e) {
+
             throw new RuntimeException(
-                    "Failed to load Config.properties", e);
+                    "Unable to load config.properties",
+                    e
+            );
         }
     }
 
     public static String get(String key) {
-        return prop.getProperty(key);
+
+        if (key == null || key.trim().isEmpty()) {
+            return null;
+        }
+
+        /*
+         * Jenkins / Maven -D property gets priority.
+         *
+         * Example:
+         * mvn test -Dbrowser=edge
+         *
+         * This allows Jenkins parameters to override
+         * config.properties without changing the file.
+         */
+        String systemProperty = System.getProperty(key);
+
+        if (systemProperty != null
+                && !systemProperty.trim().isEmpty()) {
+
+            return systemProperty.trim();
+        }
+
+        String value = properties.getProperty(key);
+
+        if (value == null) {
+            return null;
+        }
+
+        return value.trim();
+    }
+
+    public static String get(String key, String defaultValue) {
+
+        String value = get(key);
+
+        if (value == null || value.isEmpty()) {
+            return defaultValue;
+        }
+
+        return value;
+    }
+
+    public static boolean getBoolean(
+            String key,
+            boolean defaultValue) {
+
+        String value = get(key);
+
+        if (value == null || value.isEmpty()) {
+            return defaultValue;
+        }
+
+        return Boolean.parseBoolean(value);
+    }
+
+    public static int getInt(
+            String key,
+            int defaultValue) {
+
+        String value = get(key);
+
+        if (value == null || value.isEmpty()) {
+            return defaultValue;
+        }
+
+        try {
+
+            return Integer.parseInt(value);
+
+        } catch (NumberFormatException e) {
+
+            return defaultValue;
+        }
     }
 }
+
