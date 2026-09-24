@@ -3,10 +3,17 @@
 
 <suite name="Cross Browser Suite"
        parallel="tests"
-       thread-count="3">
+       thread-count="4">
 
     <test name="Chrome">
         <parameter name="browser" value="chrome"/>
+        <classes>
+            <class name="testRunner.MainRunner"/>
+        </classes>
+    </test>
+
+    <test name="Firefox">
+        <parameter name="browser" value="firefox"/>
         <classes>
             <class name="testRunner.MainRunner"/>
         </classes>
@@ -18,9 +25,9 @@
             <class name="testRunner.MainRunner"/>
         </classes>
     </test>
-    
-     <test name="Firefox">
-        <parameter name="browser" value="firefoc"/>
+
+    <test name="Safari">
+        <parameter name="browser" value="safari"/>
         <classes>
             <class name="testRunner.MainRunner"/>
         </classes>

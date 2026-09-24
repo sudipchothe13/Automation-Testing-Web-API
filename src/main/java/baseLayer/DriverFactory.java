@@ -37,23 +37,23 @@ public class DriverFactory {
          *
          * then:
          *
-         * config.properties
+         * TestNG XML browser parameter
          *
          * then:
          *
-         * method parameter
+         * config.properties
          *
          * finally:
          *
          * chrome
          */
 
-        String configuredBrowser = ConfigReader.get("browser");
+        String configuredBrowser = browser;
 
         if (configuredBrowser == null
                 || configuredBrowser.trim().isEmpty()) {
 
-            configuredBrowser = browser;
+            configuredBrowser = ConfigReader.get("browser");
         }
 
         if (configuredBrowser == null

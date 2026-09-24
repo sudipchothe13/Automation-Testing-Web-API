@@ -8,6 +8,8 @@ import org.apache.logging.log4j.ThreadContext;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.DataProvider;
+import org.testng.annotations.Optional;
+import org.testng.annotations.Parameters;
 
 import baseLayer.BaseClass;
 import baseLayer.BrowserManager;
@@ -43,12 +45,19 @@ public class MainRunner extends AbstractTestNGCucumberTests {
 
     // ================== BROWSER CONFIGURATION ==================
     @BeforeMethod(alwaysRun = true)
-    public void setBrowser() {
+    @Parameters("browser")
+    public void setBrowser(@Optional String testNgBrowser) {
 
         // Jenkins -Dbrowser has priority
         String browser = System.getProperty("browser");
 
         // If Jenkins browser is not provided,
+        // use browser from TestNG XML
+        if (browser == null || browser.trim().isEmpty()) {
+            browser = testNgBrowser;
+        }
+
+        // If TestNG browser is not provided,
         // use browser from Config.properties
         if (browser == null || browser.trim().isEmpty()) {
             browser = ConfigReader.get("browser");
