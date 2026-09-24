@@ -65,7 +65,6 @@ public class DriverFactory {
         configuredBrowser =
                 configuredBrowser.trim().toLowerCase();
 
-
         /*
          * =========================
          * EXECUTION MODE
@@ -95,7 +94,6 @@ public class DriverFactory {
                         ? "Jenkins"
                         : "Local Machine";
 
-
         /*
          * =========================
          * HEADLESS
@@ -108,7 +106,6 @@ public class DriverFactory {
                         false
                 );
 
-
         /*
          * =========================
          * INCOGNITO
@@ -120,7 +117,6 @@ public class DriverFactory {
                         "incognito",
                         false
                 );
-
 
         /*
          * =========================
@@ -146,7 +142,6 @@ public class DriverFactory {
                         30
                 );
 
-
         /*
          * =========================
          * LOG CONFIGURATION
@@ -157,16 +152,14 @@ public class DriverFactory {
 
         Log.info("Environment : " + formatValue(executionEnvironment)
                 + " | Mode : " + formatValue(executionMode));
-        
+
         Log.info("Execution  : UI"
                 + " | Browser : " + formatValue(configuredBrowser));
 
         Log.info("Headless   : " + formatValue(headless)
                 + " | Incognito : " + formatValue(incognito));
 
-
         WebDriver driver;
-
 
         /*
          * =========================
@@ -184,7 +177,6 @@ public class DriverFactory {
                     );
         }
 
-
         /*
          * =========================
          * REMOTE EXECUTION
@@ -201,7 +193,6 @@ public class DriverFactory {
                     );
         }
 
-
         /*
          * =========================
          * INVALID EXECUTION MODE
@@ -216,7 +207,6 @@ public class DriverFactory {
                             + ". Use local or remote."
             );
         }
-
 
         /*
          * =========================
@@ -248,7 +238,6 @@ public class DriverFactory {
                         )
                 );
 
-
         /*
          * =========================
          * WINDOW
@@ -273,7 +262,6 @@ public class DriverFactory {
             );
         }
 
-
         /*
          * =========================
          * THREAD LOCAL
@@ -283,7 +271,6 @@ public class DriverFactory {
         BaseClass.setDriver(driver);
         BaseClass.setBrowser(configuredBrowser);
 
-
         /*
         Log.info(
                 "Browser launched successfully: "
@@ -291,7 +278,6 @@ public class DriverFactory {
                         + " | Mode: "
                         + executionMode
         );
-
         */
 
         return driver;
@@ -307,9 +293,7 @@ public class DriverFactory {
             boolean headless,
             boolean incognito) {
 
-
         switch (browser) {
-
 
             // =================================================
             // CHROME
@@ -324,6 +308,11 @@ public class DriverFactory {
 
                     chromeOptions.addArguments(
                             "--headless=new"
+                    );
+
+                    // FIX: Keep Jenkins headless screenshot size consistent
+                    chromeOptions.addArguments(
+                            "--window-size=1920,1080"
                     );
                 }
 
@@ -401,6 +390,11 @@ public class DriverFactory {
 
                     edgeOptions.addArguments(
                             "--headless=new"
+                    );
+
+                    // FIX: Keep Jenkins headless screenshot size consistent
+                    edgeOptions.addArguments(
+                            "--window-size=1920,1080"
                     );
                 }
 
@@ -486,13 +480,11 @@ public class DriverFactory {
             boolean headless,
             boolean incognito) {
 
-
         String remoteUrl =
                 ConfigReader.get(
                         "remoteUrl",
                         "http://localhost:4444"
                 );
-
 
         String platform =
                 ConfigReader.get(
@@ -500,13 +492,11 @@ public class DriverFactory {
                         ""
                 );
 
-
         String browserVersion =
                 ConfigReader.get(
                         "browserVersion",
                         ""
                 );
-
 
         Log.info(
                 "Remote Selenium Grid URL: "
@@ -523,9 +513,7 @@ public class DriverFactory {
                         + browserVersion
         );
 
-
         MutableCapabilities options;
-
 
         /*
          * =====================================================
@@ -543,6 +531,11 @@ public class DriverFactory {
                 chromeOptions.addArguments(
                         "--headless=new"
                 );
+
+                // FIX: Keep remote headless screenshot size consistent
+                chromeOptions.addArguments(
+                        "--window-size=1920,1080"
+                );
             }
 
             if (incognito) {
@@ -558,7 +551,6 @@ public class DriverFactory {
 
             options = chromeOptions;
         }
-
 
         /*
          * =====================================================
@@ -589,7 +581,6 @@ public class DriverFactory {
             options = firefoxOptions;
         }
 
-
         /*
          * =====================================================
          * EDGE
@@ -606,6 +597,11 @@ public class DriverFactory {
                 edgeOptions.addArguments(
                         "--headless=new"
                 );
+
+                // FIX: Keep remote headless screenshot size consistent
+                edgeOptions.addArguments(
+                        "--window-size=1920,1080"
+                );
             }
 
             if (incognito) {
@@ -621,7 +617,6 @@ public class DriverFactory {
 
             options = edgeOptions;
         }
-
 
         /*
          * =====================================================
@@ -654,11 +649,11 @@ public class DriverFactory {
             options = safariOptions;
         }
 
-
         /*
          * =====================================================
          * INVALID BROWSER
-         * ===================================================== */
+         * =====================================================
+         */
 
         else {
 
@@ -667,7 +662,6 @@ public class DriverFactory {
                             + browser
             );
         }
-
 
         /*
          * =====================================================
@@ -703,7 +697,6 @@ public class DriverFactory {
             }
         }
 
-
         /*
          * =====================================================
          * BROWSER VERSION
@@ -718,7 +711,6 @@ public class DriverFactory {
                     browserVersion
             );
         }
-
 
         /*
          * =====================================================
