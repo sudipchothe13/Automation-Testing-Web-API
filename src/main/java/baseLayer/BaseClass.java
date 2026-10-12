@@ -1,8 +1,9 @@
+
 package baseLayer;
 
-import java.util.Map;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
+import java.util.Map;
 
 import org.apache.logging.log4j.ThreadContext;
 import org.openqa.selenium.WebDriver;
@@ -16,141 +17,282 @@ import io.restassured.filter.log.ResponseLoggingFilter;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
+import utilsLayer.DBUtils;
 
 public class BaseClass {
 
-    // ================= DRIVER =================
-    private static ThreadLocal<WebDriver> driver = new ThreadLocal<>();
-    public static void setDriver(WebDriver drv) { driver.set(drv); }
-    public static WebDriver getDriver() { return driver.get(); }
-    public static void unloadDriver() { driver.remove(); }
+	// ================= DRIVER =================
+	private static final ThreadLocal<WebDriver> driver = new ThreadLocal<>();
 
-    // ================= BROWSER =================
-    private static ThreadLocal<String> browser = new ThreadLocal<>();
-    public static void setBrowser(String browserName) { browser.set(browserName); }
-    public static String getBrowser() { return browser.get(); }
-    public static void unloadBrowser() { browser.remove(); }
+	public static void setDriver(WebDriver drv) {
+		driver.set(drv);
+	}
 
-    // ================= UNLOAD ALL =================
-    public static void unloadAll() {
-        unloadDriver();
-        unloadBrowser();
-    }
+	public static WebDriver getDriver() {
+		return driver.get();
+	}
 
-    // ================= THREADCONTEXT / LOGGING =================
-    public static void setBrowserContext(String browserName) {
-        if (browserName == null || browserName.isEmpty()) {
-            ThreadContext.put("browser", "REST");
-        } else {
-            ThreadContext.put("browser",
-                    browserName.substring(0, 1).toUpperCase() + browserName.substring(1).toLowerCase());
-        }
-    }
+	public static void unloadDriver() {
+		driver.remove();
+	}
 
-    public static void initRestLogging() {
-        ThreadContext.put("browser", "REST"); // REST API logs
-    }
+	// ================= BROWSER =================
+	private static final ThreadLocal<String> browser = new ThreadLocal<>();
 
-    public static void clearRestLogging() {
-        ThreadContext.remove("browser");
-    }
+	public static void setBrowser(String browserName) {
+		browser.set(browserName);
+	}
 
-    // ====================== REST ASSURED ======================
-    private static ThreadLocal<RequestSpecification> httpRequest = new ThreadLocal<>();
-    private static ThreadLocal<Response> response = new ThreadLocal<>();
-    private static ThreadLocal<ByteArrayOutputStream> requestOutputStream = new ThreadLocal<>();
-    private static ThreadLocal<ByteArrayOutputStream> responseOutputStream = new ThreadLocal<>();
-    private static ThreadLocal<String> pathParamEndpoint = new ThreadLocal<>();
+	public static String getBrowser() {
+		return browser.get();
+	}
 
-    public static void initRestAssured() {
-        ByteArrayOutputStream reqStream = new ByteArrayOutputStream();
-        ByteArrayOutputStream resStream = new ByteArrayOutputStream();
-        requestOutputStream.set(reqStream);
-        responseOutputStream.set(resStream);
+	public static void unloadBrowser() {
+		browser.remove();
+	}
 
-        PrintStream reqPrintStream = new PrintStream(reqStream);
-        PrintStream resPrintStream = new PrintStream(resStream);
+	// ================= UNLOAD ALL =================
+	public static void unloadAll() {
+		unloadDriver();
+		unloadBrowser();
+	}
 
-        RestAssured.filters(
-                new RequestLoggingFilter(LogDetail.ALL, reqPrintStream),
-                new ResponseLoggingFilter(LogDetail.ALL, resPrintStream)
-        );
+	// ================= CLEANUP ALL RESOURCES =================
+	public static void cleanup() {
 
-        RestAssured.baseURI = ConfigReader.get("baseURI");
-        httpRequest.set(RestAssured.given().contentType(ContentType.JSON));
-    }
+		try {
+			WebDriver currentDriver = getDriver();
 
-    public static void addHeaders(Map<String, String> headers) {
-        if (headers != null && !headers.isEmpty()) httpRequest.get().headers(headers);
-    }
+			if (currentDriver != null) {
+				currentDriver.quit();
+				Log.info("Browser closed successfully");
+			}
 
-    public static void addRequestBody(Object body) {
-        if (body != null) httpRequest.get().body(body);
-    }
+		} catch (Exception e) {
+			Log.info("Browser cleanup failed: " + e.getMessage());
 
-    public static void addQueryParams(String key, String value) {
-        if (key != null && value != null) httpRequest.get().queryParam(key, value);
-    }
+		} finally {
+			try {
+				DBUtils.disconnectFromDB();
+			} catch (Exception e) {
+				Log.info("Database cleanup failed: " + e.getMessage());
 
-    public static void addPathParams(String endpoint) {
-        if (endpoint != null && !endpoint.isEmpty()) pathParamEndpoint.set(endpoint);
-    }
+			} finally {
+				try {
+					clear();
+				} finally {
+					try {
+						unloadAll();
+					} finally {
+						ThreadContext.clearAll();
+					}
+				}
+			}
+		}
+	}
 
-    public static Response sendRequest(String type) {
-        String endpoint = pathParamEndpoint.get();
-        if (endpoint == null || endpoint.isEmpty()) throw new IllegalArgumentException("Endpoint not set");
+	// ================= THREADCONTEXT / LOGGING =================
+	public static void setBrowserContext(String browserName) {
+		if (browserName == null || browserName.isEmpty()) {
+			ThreadContext.put("browser", "REST");
+		} else {
+			ThreadContext.put("browser",
+					browserName.substring(0, 1).toUpperCase() + browserName.substring(1).toLowerCase());
+		}
+	}
 
-        switch (type.toUpperCase()) {
-            case "GET": response.set(httpRequest.get().get(endpoint)); break;
-            case "POST": response.set(httpRequest.get().post(endpoint)); break;
-            case "PUT": response.set(httpRequest.get().put(endpoint)); break;
-            case "PATCH": response.set(httpRequest.get().patch(endpoint)); break;
-            case "DELETE": response.set(httpRequest.get().delete(endpoint)); break;
-            default: throw new IllegalArgumentException("Unsupported request type: " + type);
-        }
+	public static void initRestLogging() {
+		ThreadContext.put("browser", "REST");
+	}
 
-        logRequestResponse();
-        return response.get();
-    }
+	public static void clearRestLogging() {
+		ThreadContext.remove("browser");
+	}
 
-    private static void logRequestResponse() {
-        try { requestOutputStream.get().flush(); responseOutputStream.get().flush(); } catch (Exception ignored) {}
+	// ====================== REST ASSURED ======================
+	private static final ThreadLocal<RequestSpecification> httpRequest = new ThreadLocal<>();
 
-        String requestLog = requestOutputStream.get().toString()
-                .replaceAll("(Authorization: Bearer )(.*)", "$1********");
-        String responseLog = responseOutputStream.get().toString();
+	private static final ThreadLocal<Response> response = new ThreadLocal<>();
 
- //       Log.info("========== API SCENARIO START ==========");
-          Log.info("--------------------- Request Logs started: --------------------\n" + requestLog);
-          Log.info("--------------------- Response Logs started: -------------------\n" + responseLog);
- //       Log.info("========== API SCENARIO END ==========\n");
-        
- //        Log.info("---------------------------------------- Request Logs----------------------------------------\n" + requestLog); 
- //        Log.info("---------------------------------------- Response Logs----------------------------------------\n" + responseLog);
-    }
+	private static final ThreadLocal<ByteArrayOutputStream> requestOutputStream = new ThreadLocal<>();
 
-    // ====================== GETTERS FOR REPORTS ======================
-    public static String getRequestLog() {
-        if (requestOutputStream.get() == null) return "";
-        try { requestOutputStream.get().flush(); } catch (Exception ignored) {}
-        return requestOutputStream.get().toString().replaceAll("(Authorization: Bearer )(.*)", "$1********");
-    }
+	private static final ThreadLocal<ByteArrayOutputStream> responseOutputStream = new ThreadLocal<>();
 
-    public static String getResponseLog() {
-        if (responseOutputStream.get() == null) return "";
-        try { responseOutputStream.get().flush(); } catch (Exception ignored) {}
-        return responseOutputStream.get().toString();
-    }
+	private static final ThreadLocal<String> pathParamEndpoint = new ThreadLocal<>();
 
-    public static int getStatusCode() { return response.get().getStatusCode(); }
-    public static String getResponseBody() { return response.get().getBody().asString(); }
-    public static Response getResponse() { return response.get(); }
+	public static void initializeApiRequest() {
+		initializeRequest(ConfigReader.get("baseURI"));
+		Log.info("API request initialized");
+	}
 
-    public static void clear() {
-        httpRequest.remove();
-        response.remove();
-        requestOutputStream.remove();
-        responseOutputStream.remove();
-        pathParamEndpoint.remove();
-    }
+	public static void initializeWireMockServerApiRequest() {
+		initializeRequest(ConfigReader.get("wireMockURI"));
+		Log.info("WireMock API request initialized");
+		Log.info("WireMock URI: " + ConfigReader.get("wireMockURI"));
+	}
+
+	private static void initializeRequest(String baseURI) {
+		ByteArrayOutputStream reqStream = new ByteArrayOutputStream();
+		ByteArrayOutputStream resStream = new ByteArrayOutputStream();
+
+		requestOutputStream.set(reqStream);
+		responseOutputStream.set(resStream);
+
+		PrintStream reqPrintStream = new PrintStream(reqStream);
+		PrintStream resPrintStream = new PrintStream(resStream);
+
+		RequestLoggingFilter requestFilter = new RequestLoggingFilter(LogDetail.ALL, reqPrintStream);
+
+		ResponseLoggingFilter responseFilter = new ResponseLoggingFilter(LogDetail.ALL, resPrintStream);
+
+		RequestSpecification request = RestAssured.given().baseUri(baseURI).contentType(ContentType.JSON)
+				.filter(requestFilter).filter(responseFilter);
+
+		httpRequest.set(request);
+		response.remove();
+		pathParamEndpoint.remove();
+	}
+
+	public static void setHeaders(Map<String, String> headers) {
+		if (headers != null && !headers.isEmpty()) {
+			httpRequest.get().headers(headers);
+		}
+		Log.info("Request headers set");
+	}
+
+	public static void setRequestBody(Object body) {
+		if (body != null) {
+			httpRequest.get().body(body);
+		}
+		Log.info("Request body set");
+	}
+
+	public static void setQueryParams(String key, String value) {
+		if (key != null && value != null) {
+			httpRequest.get().queryParam(key, value);
+		}
+		Log.info("Query parameter set: " + key + " = " + value);
+	}
+
+	public static void setPathParams(String endpoint) {
+		if (endpoint != null && !endpoint.isEmpty()) {
+			pathParamEndpoint.set(endpoint);
+		}
+		Log.info("API endpoint set: " + endpoint);
+	}
+
+	public static Response setRequestMethod(String type) {
+		String endpoint = pathParamEndpoint.get();
+
+		if (endpoint == null || endpoint.isEmpty()) {
+			throw new IllegalArgumentException("Endpoint not set");
+		}
+
+		RequestSpecification request = httpRequest.get();
+
+		if (request == null) {
+			throw new IllegalStateException("API request not initialized. Call initializeApiRequest() first.");
+		}
+
+		Log.info("Executing request: " + type.toUpperCase() + " & Endpoint : " + endpoint);
+
+		switch (type.toUpperCase()) {
+		case "GET":
+			response.set(request.get(endpoint));
+			break;
+		case "POST":
+			response.set(request.post(endpoint));
+			break;
+		case "PUT":
+			response.set(request.put(endpoint));
+			break;
+		case "PATCH":
+			response.set(request.patch(endpoint));
+			break;
+		case "DELETE":
+			response.set(request.delete(endpoint));
+			break;
+		default:
+			throw new IllegalArgumentException("Unsupported request type: " + type);
+		}
+
+		Log.info("API request executed successfully");
+
+		logRequestResponse();
+		return response.get();
+	}
+
+	private static void logRequestResponse() {
+		ByteArrayOutputStream reqStream = requestOutputStream.get();
+		ByteArrayOutputStream resStream = responseOutputStream.get();
+		Response apiResponse = response.get();
+
+		if (reqStream == null || resStream == null || apiResponse == null) {
+			return;
+		}
+
+		String requestLog = reqStream.toString().replaceAll("(Authorization: Bearer )(.*)", "$1********");
+
+		String responseLog = resStream.toString();
+
+		Log.info("--------------------- Request Logs started: --------------------\n" + requestLog);
+		Log.info("--------------------- Response Logs started: -------------------\n" + responseLog);
+		Log.info("Response Time: " + apiResponse.time() + " ms");
+	}
+
+	// ====================== GETTERS FOR REPORTS ======================
+	public static String getRequestLog() {
+		ByteArrayOutputStream stream = requestOutputStream.get();
+
+		if (stream == null) {
+			return "";
+		}
+
+		return stream.toString().replaceAll("(Authorization: Bearer )(.*)", "$1********");
+	}
+
+	public static String getResponseLog() {
+		ByteArrayOutputStream stream = responseOutputStream.get();
+
+		return stream == null ? "" : stream.toString();
+	}
+
+	public static long getResponseTime() {
+		Response apiResponse = response.get();
+		return apiResponse == null ? 0 : apiResponse.time();
+	}
+
+	public static int getStatusCode() {
+		Response apiResponse = response.get();
+
+		if (apiResponse == null) {
+			throw new IllegalStateException("No API response available");
+		}
+
+		return apiResponse.getStatusCode();
+	}
+
+	public static String getResponseBody() {
+		Response apiResponse = response.get();
+
+		if (apiResponse == null) {
+			throw new IllegalStateException("No API response available");
+		}
+
+		return apiResponse.getBody().asString();
+	}
+
+	public static Response getResponse() {
+		return response.get();
+	}
+
+	public static void clear() {
+		httpRequest.remove();
+		response.remove();
+		requestOutputStream.remove();
+		responseOutputStream.remove();
+		pathParamEndpoint.remove();
+
+		Log.info("API thread data cleared");
+	}
 }

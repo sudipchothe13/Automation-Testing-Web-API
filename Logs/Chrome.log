@@ -1,0 +1,20 @@
+2026-10-12 15:05:08 INFO  [Automation Testing] [Chrome] **********************************************
+2026-10-12 15:05:08 INFO  [Automation Testing] [Chrome] Environment : Local machine | Mode : Local
+2026-10-12 15:05:08 INFO  [Automation Testing] [Chrome] Execution  : UI | Browser : Chrome
+2026-10-12 15:05:08 INFO  [Automation Testing] [Chrome] Headless   : False | Incognito : False
+2026-10-12 15:05:15 INFO  [Automation Testing] [Chrome] ------------- UI Scenario START --------------
+2026-10-12 15:05:15 INFO  [Automation Testing] [Chrome] Scenario : OrangeHRM Login
+2026-10-12 15:05:15 INFO  [Automation Testing] [Chrome] Browser launched successfully: CHROME
+2026-10-12 15:05:15 INFO  [Automation Testing] [Chrome] ----------------------------------------------
+2026-10-12 15:05:15 INFO  [Automation Testing] [Chrome] ✅ Checking WebDriver initialization | Actual value - true | Expected value - true
+2026-10-12 15:05:15 INFO  [Automation Testing] [Chrome] ✅ Checking OrangeHRM URL configuration | Actual value - true | Expected value - true
+2026-10-12 15:05:24 INFO  [Automation Testing] [Chrome] ✅ Checking Login button visibility | AssertTrue - PASSED
+2026-10-12 15:05:24 INFO  [Automation Testing] [Chrome] Application launched
+2026-10-12 15:05:31 INFO  [Automation Testing] [Chrome] User Entered Username
+2026-10-12 15:05:32 INFO  [Automation Testing] [Chrome] User Entered Password
+2026-10-12 15:05:41 INFO  [Automation Testing] [Chrome] ✅ Checking Dashboard visibility after login | AssertTrue - PASSED
+2026-10-12 15:05:41 INFO  [Automation Testing] [Chrome] User clicked on Login button
+2026-10-12 15:05:54 INFO  [Automation Testing] [Chrome] ✅ Comparing Dashboard visibility | Actual value - true | Expected value - true
+2026-10-12 15:05:54 INFO  [Automation Testing] [Chrome] User successfully navigated to Dashboard
+2026-10-12 15:05:54 INFO  [Automation Testing] [Chrome] ✅ Failing intentionally  | Actual value - 100 | Expected value - 100
+2026-10-12 15:05:57 INFO  [Automation Testing] [Chrome] *************** UI Scenario END **************

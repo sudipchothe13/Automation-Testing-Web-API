@@ -21,7 +21,7 @@ import io.cucumber.testng.CucumberOptions;
 
     features = "src/test/resources/featureFiles",
 
-    glue = { "stepDefinition", "HooksGUI" },
+    glue = { "stepDefinition", "hooksGUI" },
 
     tags = "@UI",
 

@@ -11,15 +11,13 @@ import com.aventstack.extentreports.cucumber.adapter.ExtentCucumberAdapter;
 import configLayer.WordLogger;
 import io.cucumber.java.Scenario;
 
-public class ScreenshotUtils {
-
-    private ScreenshotUtils() {
-    }
+public interface ScreenshotUtils {
 
     /**
      * Capture screenshot for WordLogger + Extent
      * ✔ Explicit business log (NOT a feature step)
      */
+	
     public static void capture(WebDriver driver, String message, Scenario scenario) {
 
         if (driver == null) return;
@@ -60,8 +58,8 @@ public class ScreenshotUtils {
      * Overloaded method
      */
     public static void capture(WebDriver driver, String message) {
-        Scenario scenario = HooksGUI.UIHooks.getScenario();
+        Scenario scenario = hooksGUI.UIHooks.getScenario();
         capture(driver, message, scenario);
-    }   // ✅ added
+    }   
 
-}       // ✅ added
+}       
