@@ -29,6 +29,7 @@ import io.cucumber.testng.CucumberOptions;
         "pretty",
         "summary",
         "rerun:target/rerun-ui.txt",
+        "rerun:target/rerun.txt",
         "com.aventstack.extentreports.cucumber.adapter.ExtentCucumberAdapter:"
     }
 

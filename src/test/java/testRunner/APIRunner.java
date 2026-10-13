@@ -13,7 +13,7 @@ import io.cucumber.testng.CucumberOptions;
 					features = "src/test/resources/featureFiles", 
 					 glue = { "stepDefinition","hooksAPI" },
 					 tags = "@personalDetails", 
-					 plugin = { "pretty", "rerun:target/rerun-api.txt",
+					 plugin = { "pretty", "rerun:target/rerun-api.txt", "rerun:target/rerun.txt",
 								"com.aventstack.extentreports.cucumber.adapter.ExtentCucumberAdapter:" }
 	)
 	
