@@ -1,0 +1,110 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+
+  "properties": {
+
+    "data": {
+      "type": "object",
+
+      "properties": {
+
+        "personalDetails": {
+          "type": "object",
+
+          "properties": {
+
+            "psId": {
+              "type": "integer"
+            },
+
+            "firstName": {
+              "type": "string"
+            },
+
+            "lastName": {
+              "type": "string"
+            },
+
+            "totalExperience": {
+              "type": "number"
+            },
+
+            "currentCompany": {
+              "type": "string"
+            },
+
+            "currentCTC": {
+              "type": "number"
+            },
+
+            "isReadyToRelocate": {
+              "type": "boolean"
+            },
+
+            "primarySkills": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+
+            "address": {
+              "type": "object",
+
+              "properties": {
+
+                "pin": {
+                  "type": "integer"
+                },
+
+                "city": {
+                  "type": "string"
+                }
+
+              },
+
+              "required": [
+                "pin",
+                "city"
+              ]
+            }
+
+          },
+
+          "required": [
+            "psId",
+            "firstName",
+            "lastName",
+            "totalExperience",
+            "currentCompany",
+            "currentCTC",
+            "isReadyToRelocate",
+            "primarySkills",
+            "address"
+          ]
+        }
+
+      },
+
+      "required": [
+        "personalDetails"
+      ]
+    },
+
+    "entityType": {
+      "type": "null"
+    },
+
+    "meta": {
+      "type": "null"
+    }
+
+  },
+
+  "required": [
+    "data",
+    "entityType",
+    "meta"
+  ]
+}

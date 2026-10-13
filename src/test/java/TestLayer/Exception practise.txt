@@ -1,0 +1,17 @@
+Exception
+│
+├── RuntimeException                    → Unchecked
+│   │
+│   ├── NullPointerException
+│   ├── ArithmeticException
+│   ├── ArrayIndexOutOfBoundsException
+│   ├── NumberFormatException
+│   ├── ClassCastException
+│   └── IllegalArgumentException
+│
+├── IOException                         → Checked
+│   └── FileNotFoundException
+│
+├── SQLException                        → Checked
+│
+└── ClassNotFoundException              → Checked

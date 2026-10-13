@@ -21,7 +21,7 @@ import io.cucumber.testng.CucumberOptions;
 
     features = "src/test/resources/featureFiles",
 
-    glue = { "stepDefinition", "HooksGUI" },
+    glue = { "stepDefinition", "hooksGUI" },
 
     tags = "@UI",
 
@@ -29,6 +29,7 @@ import io.cucumber.testng.CucumberOptions;
         "pretty",
         "summary",
         "rerun:target/rerun-ui.txt",
+        "rerun:target/rerun.txt",
         "com.aventstack.extentreports.cucumber.adapter.ExtentCucumberAdapter:"
     }
 

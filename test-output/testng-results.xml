@@ -1,103 +1,60 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testng-results ignored="0" total="2" passed="0" failed="2" skipped="0">
+<testng-results ignored="0" total="1" passed="1" failed="0" skipped="0">
   <reporter-output>
   </reporter-output>
-  <suite started-at="2026-09-24T22:01:03 IST" name="Default suite" finished-at="2026-09-24T22:01:03 IST" duration-ms="599">
+  <suite started-at="2026-10-12T21:25:28 IST" name="Default suite" finished-at="2026-10-12T21:26:28 IST" duration-ms="60378">
     <groups>
       <group name="cucumber">
-        <method signature="AbstractTestNGCucumberTests.runScenario(io.cucumber.testng.PickleWrapper,io.cucumber.testng.FeatureWrapper)[pri:0, instance:testRunner.APIRunner@4a668b6e]" name="runScenario" class="io.cucumber.testng.AbstractTestNGCucumberTests"/>
+        <method signature="AbstractTestNGCucumberTests.runScenario(io.cucumber.testng.PickleWrapper,io.cucumber.testng.FeatureWrapper)[pri:0, instance:testRunner.MainRunner@152aa092]" name="runScenario" class="io.cucumber.testng.AbstractTestNGCucumberTests"/>
       </group> <!-- cucumber -->
     </groups>
-    <test started-at="2026-09-24T22:01:03 IST" name="Default test" finished-at="2026-09-24T22:01:03 IST" duration-ms="599">
-      <class name="testRunner.APIRunner">
-        <test-method is-config="true" signature="setupAPI()[pri:0, instance:testRunner.APIRunner@4a668b6e]" started-at="2026-09-24T22:01:02 IST" name="setupAPI" finished-at="2026-09-24T22:01:03 IST" duration-ms="120" status="PASS">
+    <test started-at="2026-10-12T21:25:28 IST" name="Default test" finished-at="2026-10-12T21:26:28 IST" duration-ms="60378">
+      <class name="testRunner.MainRunner">
+        <test-method is-config="true" signature="setupExtentReport()[pri:0, instance:testRunner.MainRunner@152aa092]" started-at="2026-10-12T21:25:28 IST" name="setupExtentReport" finished-at="2026-10-12T21:25:28 IST" duration-ms="4" status="PASS">
           <reporter-output>
           </reporter-output>
-        </test-method> <!-- setupAPI -->
-        <test-method is-config="true" signature="setUpClass(org.testng.ITestContext)[pri:0, instance:testRunner.APIRunner@4a668b6e]" started-at="2026-09-24T22:01:03 IST" name="setUpClass" finished-at="2026-09-24T22:01:03 IST" duration-ms="94" status="PASS">
+        </test-method> <!-- setupExtentReport -->
+        <test-method is-config="true" signature="setUpClass(org.testng.ITestContext)[pri:0, instance:testRunner.MainRunner@152aa092]" started-at="2026-10-12T21:25:28 IST" name="setUpClass" finished-at="2026-10-12T21:25:28 IST" duration-ms="140" status="PASS">
           <params>
             <param index="0">
               <value>
-                <![CDATA[org.testng.TestRunner@324e8baa]]>
+                <![CDATA[org.testng.TestRunner@2160e52a]]>
               </value>
             </param>
           </params>
           <reporter-output>
           </reporter-output>
         </test-method> <!-- setUpClass -->
-        <test-method signature="runScenario(io.cucumber.testng.PickleWrapper,io.cucumber.testng.FeatureWrapper)[pri:0, instance:testRunner.APIRunner@4a668b6e]" started-at="2026-09-24T22:01:03 IST" name="runScenario" description="Runs Cucumber Scenarios" data-provider="scenarios" finished-at="2026-09-24T22:01:03 IST" duration-ms="407" status="FAIL">
+        <test-method is-config="true" signature="setBrowser(java.lang.String)[pri:0, instance:testRunner.MainRunner@152aa092]" started-at="2026-10-12T21:25:28 IST" name="setBrowser" finished-at="2026-10-12T21:25:28 IST" duration-ms="20" status="PASS">
+          <params>
+            <param index="0">
+              <value is-null="true"/>
+            </param>
+          </params>
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- setBrowser -->
+        <test-method signature="runScenario(io.cucumber.testng.PickleWrapper,io.cucumber.testng.FeatureWrapper)[pri:0, instance:testRunner.MainRunner@152aa092]" started-at="2026-10-12T21:25:28 IST" name="runScenario" description="Runs Cucumber Scenarios" data-provider="scenarios" finished-at="2026-10-12T21:26:28 IST" duration-ms="60110" status="PASS">
           <params>
             <param index="0">
               <value>
-                <![CDATA["Verify POST Companies API"]]>
+                <![CDATA["OrangeHRM Login"]]>
               </value>
             </param>
             <param index="1">
               <value>
-                <![CDATA["Companies API"]]>
+                <![CDATA["OrangeHRM feature"]]>
               </value>
             </param>
           </params>
-          <exception class="java.lang.AssertionError">
-            <message>
-              <![CDATA[expected [200] but found [100]]]>
-            </message>
-            <full-stacktrace>
-              <![CDATA[java.lang.AssertionError: expected [200] but found [100]
-at org.testng.Assert.fail(Assert.java:111)
-at org.testng.Assert.failNotEquals(Assert.java:1578)
-at org.testng.Assert.assertEqualsImpl(Assert.java:150)
-at org.testng.Assert.assertEquals(Assert.java:132)
-at org.testng.Assert.assertEquals(Assert.java:1419)
-at org.testng.Assert.assertEquals(Assert.java:1383)
-at org.testng.Assert.assertEquals(Assert.java:1429)
-at stepDefinition.CompaniesStepDefinition.response_status_code_should_be(CompaniesStepDefinition.java:69)
-at ✽.Response status code should be 201(file:///Users/sudipdilipchothe/eclipse-workspace/Web-API-Automation/src/test/resources/featureFiles/API_Automation.feature:7)
-]]>
-            </full-stacktrace>
-          </exception> <!-- java.lang.AssertionError -->
           <reporter-output>
           </reporter-output>
         </test-method> <!-- runScenario -->
-        <test-method signature="runScenario(io.cucumber.testng.PickleWrapper,io.cucumber.testng.FeatureWrapper)[pri:0, instance:testRunner.APIRunner@4a668b6e]" started-at="2026-09-24T22:01:03 IST" name="runScenario" description="Runs Cucumber Scenarios" data-provider="scenarios" finished-at="2026-09-24T22:01:03 IST" duration-ms="14" status="FAIL">
-          <params>
-            <param index="0">
-              <value>
-                <![CDATA["Verify GET Companies API"]]>
-              </value>
-            </param>
-            <param index="1">
-              <value>
-                <![CDATA["Companies API"]]>
-              </value>
-            </param>
-          </params>
-          <exception class="java.lang.AssertionError">
-            <message>
-              <![CDATA[expected [200] but found [100]]]>
-            </message>
-            <full-stacktrace>
-              <![CDATA[java.lang.AssertionError: expected [200] but found [100]
-at org.testng.Assert.fail(Assert.java:111)
-at org.testng.Assert.failNotEquals(Assert.java:1578)
-at org.testng.Assert.assertEqualsImpl(Assert.java:150)
-at org.testng.Assert.assertEquals(Assert.java:132)
-at org.testng.Assert.assertEquals(Assert.java:1419)
-at org.testng.Assert.assertEquals(Assert.java:1383)
-at org.testng.Assert.assertEquals(Assert.java:1429)
-at stepDefinition.CompaniesStepDefinition.response_status_code_should_be(CompaniesStepDefinition.java:69)
-at ✽.Response status code should be 200(file:///Users/sudipdilipchothe/eclipse-workspace/Web-API-Automation/src/test/resources/featureFiles/API_Automation.feature:13)
-]]>
-            </full-stacktrace>
-          </exception> <!-- java.lang.AssertionError -->
-          <reporter-output>
-          </reporter-output>
-        </test-method> <!-- runScenario -->
-        <test-method is-config="true" signature="tearDownClass()[pri:0, instance:testRunner.APIRunner@4a668b6e]" started-at="2026-09-24T22:01:03 IST" name="tearDownClass" finished-at="2026-09-24T22:01:03 IST" duration-ms="74" status="PASS">
+        <test-method is-config="true" signature="tearDownClass()[pri:0, instance:testRunner.MainRunner@152aa092]" started-at="2026-10-12T21:26:28 IST" name="tearDownClass" finished-at="2026-10-12T21:26:28 IST" duration-ms="95" status="PASS">
           <reporter-output>
           </reporter-output>
         </test-method> <!-- tearDownClass -->
-      </class> <!-- testRunner.APIRunner -->
+      </class> <!-- testRunner.MainRunner -->
     </test> <!-- Default test -->
   </suite> <!-- Default suite -->
 </testng-results>

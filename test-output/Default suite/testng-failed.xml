@@ -8,7 +8,7 @@
           <include name="setUpClass"/>
           <include name="setupAPI"/>
           <include name="tearDownClass"/>
-          <include name="runScenario" invocation-numbers="0 1"/>
+          <include name="runScenario" invocation-numbers="0"/>
         </methods>
       </class> <!-- testRunner.APIRunner -->
     </classes>
